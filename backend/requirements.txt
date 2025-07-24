@@ -1,0 +1,4 @@
+Django>=5.2
+psycopg2-binary>=2.9
+djangorestframework>=3.16
+corsheaders>=4.3 
