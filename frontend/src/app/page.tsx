@@ -6,110 +6,77 @@ import { faRobot, faBookOpen, faUsers } from "@fortawesome/free-solid-svg-icons"
 
 export default function Home() {
   return (
-    <div className="relative font-sans min-h-screen flex flex-col justify-between overflow-hidden" style={{background: "linear-gradient(135deg, #0ea5e9 0%, #a78bfa 40%, #f472b6 80%, #fbbf24 100%)"}}>
-      {/* 多色动态光斑背景 */}
-      <div className="absolute inset-0 z-0 pointer-events-none">
-        <div className="absolute w-80 h-80 bg-cyan-400/20 rounded-full blur-3xl left-[-10%] top-[-10%] animate-pulse" />
-        <div className="absolute w-72 h-72 bg-pink-400/20 rounded-full blur-2xl right-[-8%] top-[30%] animate-pulse-slow" />
-        <div className="absolute w-64 h-64 bg-yellow-300/20 rounded-full blur-2xl left-[40%] bottom-[-10%] animate-pulse" />
-        <div className="absolute w-60 h-60 bg-purple-400/20 rounded-full blur-2xl right-[20%] bottom-[10%] animate-pulse-slow" />
-      </div>
-      {/* Navbar with Logo placeholder */}
-      <header className="relative z-10 w-full flex items-center justify-between px-6 py-4 shadow-lg bg-blue-950/80 backdrop-blur-md">
+    <div className="min-h-screen w-full bg-gradient-to-br from-gray-900 via-gray-950 to-blue-950 text-gray-100 font-sans">
+      {/* 顶部导航栏 */}
+      <header className="w-full flex items-center justify-between px-8 py-6 border-b border-gray-800 bg-gray-950/90 sticky top-0 z-20">
         <div className="flex items-center gap-3">
-          <Logo size={32} />
-          <span className="text-2xl font-bold tracking-wide text-blue-100 drop-shadow">Airoam</span>
+          <Logo size={36} />
+          <span className="text-2xl font-bold tracking-wide text-white">Airoam</span>
         </div>
-        <nav className="flex gap-6 text-lg">
-          <a href="#features" className="hover:text-cyan-300 transition flex items-center gap-1"><FontAwesomeIcon icon={faRobot} /> Features</a>
-          <a href="#contact" className="hover:text-pink-300 transition flex items-center gap-1"><FontAwesomeIcon icon={faUsers} /> Contact</a>
+        <nav className="flex gap-8 text-lg font-medium">
+          <a href="#news" className="hover:text-blue-400 transition">AI News</a>
+          <a href="#tutorials" className="hover:text-blue-400 transition">Tutorials</a>
+          <a href="#community" className="hover:text-blue-400 transition">Community</a>
+          <a href="#contact" className="hover:text-blue-400 transition">Contact</a>
         </nav>
       </header>
-      <main className="relative z-10 flex-1 flex flex-col items-center justify-center gap-10 px-4">
-        {/* 品牌与简介 */}
-        <div className="flex flex-col items-center gap-4 mt-8">
-          <div className="w-16 h-16 flex items-center justify-center mb-2">
-            <Logo size={64} />
-          </div>
-          <h1 className="text-4xl sm:text-5xl font-extrabold tracking-tight text-center text-blue-100 drop-shadow-lg">Airoam - AI News Aggregator</h1>
-          <p className="text-lg sm:text-xl text-cyan-100 text-center max-w-2xl drop-shadow">Your gateway to the latest global AI news, research, tutorials, and expert insights. Stay ahead in the world of artificial intelligence.</p>
-        </div>
-        {/* AI 资讯动态区块 */}
-        <section className="w-full max-w-5xl grid grid-cols-1 md:grid-cols-2 gap-8 mt-4">
-          <div className="bg-white/80 rounded-2xl shadow-2xl p-8 flex flex-col gap-3 border-l-8 border-cyan-400">
-            <h2 className="text-2xl font-bold text-cyan-700 mb-2 flex items-center gap-2"><FontAwesomeIcon icon={faRobot} /> Latest AI News</h2>
-            <ul className="text-gray-800 text-base list-disc list-inside space-y-1">
-              <li><span className="font-semibold">AI beats human at Go again!</span> <span className="text-xs text-gray-500">(X)</span></li>
-              <li><span className="font-semibold">New GPT-5 research paper released</span> <span className="text-xs text-gray-500">(arXiv)</span></li>
-              <li><span className="font-semibold">AI-powered robots enter mass production</span> <span className="text-xs text-gray-500">(Medium)</span></li>
-              <li><span className="font-semibold">Breakthrough in AI image generation</span> <span className="text-xs text-gray-500">(X)</span></li>
-            </ul>
-            <a href="#" className="mt-2 text-cyan-700 hover:underline">See all news →</a>
-          </div>
-          {/* 教程区块 */}
-          <div className="bg-white/80 rounded-2xl shadow-2xl p-8 flex flex-col gap-3 border-l-8 border-pink-400">
-            <h2 className="text-2xl font-bold text-pink-700 mb-2 flex items-center gap-2"><FontAwesomeIcon icon={faBookOpen} /> AI Tutorials</h2>
-            <ul className="text-gray-800 text-base list-disc list-inside space-y-1">
-              <li><span className="font-semibold">Beginner: What is Machine Learning?</span></li>
-              <li><span className="font-semibold">Intermediate: Build your first AI chatbot</span></li>
-              <li><span className="font-semibold">Advanced: Fine-tune LLMs with your data</span></li>
-              <li><span className="font-semibold">Pro: Deploy AI models at scale</span></li>
-            </ul>
-            <a href="#" className="mt-2 text-pink-700 hover:underline">Explore tutorials →</a>
-          </div>
-        </section>
-        {/* 平台优势与社区介绍 */}
-        <section className="w-full max-w-5xl grid grid-cols-1 md:grid-cols-2 gap-8 mt-4">
-          <div className="bg-gradient-to-br from-yellow-100 via-pink-100 to-blue-100 rounded-2xl shadow-xl p-8 flex flex-col gap-3 border-l-8 border-yellow-400">
-            <h2 className="text-2xl font-bold text-yellow-700 mb-2">Why Choose Airoam?</h2>
-            <ul className="text-gray-700 text-base list-disc list-inside space-y-1">
-              <li>Real-time global AI news aggregation</li>
-              <li>Expert-curated tutorials for all levels</li>
-              <li>Active community for discussion and sharing</li>
-              <li>Personalized recommendations and notifications</li>
-            </ul>
-          </div>
-          <div className="bg-gradient-to-br from-cyan-100 via-purple-100 to-pink-100 rounded-2xl shadow-xl p-8 flex flex-col gap-3 border-l-8 border-purple-400">
-            <h2 className="text-2xl font-bold text-purple-700 mb-2">Airoam Community</h2>
-            <ul className="text-gray-700 text-base list-disc list-inside space-y-1">
-              <li>Share your opinions and comment on news</li>
-              <li>Connect with AI enthusiasts worldwide</li>
-              <li>Participate in events and webinars</li>
-              <li>Get support and feedback from experts</li>
-            </ul>
-          </div>
-        </section>
-        {/* 用户评价区块 */}
-        <section className="w-full max-w-5xl mt-8">
-          <h2 className="text-2xl font-bold text-center text-blue-900 mb-4">What Our Users Say</h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div className="bg-white/90 rounded-xl shadow-lg p-6 flex flex-col gap-2 border-l-4 border-cyan-400">
-              <span className="font-semibold text-cyan-700">“Airoam keeps me updated with the latest AI breakthroughs every day!”</span>
-              <span className="text-sm text-gray-500">— Alex, Data Scientist</span>
+      {/* 主内容区 */}
+      <main className="max-w-6xl mx-auto px-4 py-12 grid grid-cols-1 md:grid-cols-3 gap-12">
+        {/* AI News - 左侧两列 */}
+        <section id="news" className="md:col-span-2 flex flex-col gap-8">
+          <h1 className="text-4xl font-extrabold text-white mb-4 border-l-4 border-blue-500 pl-4">Latest AI News</h1>
+          <article className="flex flex-col gap-6">
+            <div>
+              <h2 className="text-2xl font-bold text-blue-300 mb-1">AI beats human at Go again! <span className="text-xs text-gray-400">(X)</span></h2>
+              <p className="text-base text-gray-200">A new AI system has once again defeated the world champion in Go, demonstrating the rapid progress of artificial intelligence in complex strategy games.</p>
             </div>
-            <div className="bg-white/90 rounded-xl shadow-lg p-6 flex flex-col gap-2 border-l-4 border-pink-400">
-              <span className="font-semibold text-pink-700">“The tutorials are clear and practical, perfect for beginners and pros.”</span>
-              <span className="text-sm text-gray-500">— Jamie, AI Enthusiast</span>
+            <div>
+              <h2 className="text-2xl font-bold text-blue-300 mb-1">New GPT-5 research paper released <span className="text-xs text-gray-400">(arXiv)</span></h2>
+              <p className="text-base text-gray-200">OpenAI has published the first research paper on GPT-5, revealing breakthroughs in language understanding and reasoning capabilities.</p>
             </div>
-            <div className="bg-white/90 rounded-xl shadow-lg p-6 flex flex-col gap-2 border-l-4 border-yellow-400">
-              <span className="font-semibold text-yellow-700">“I love the community and the personalized recommendations!”</span>
-              <span className="text-sm text-gray-500">— Morgan, ML Engineer</span>
+            <div>
+              <h2 className="text-2xl font-bold text-blue-300 mb-1">AI-powered robots enter mass production <span className="text-xs text-gray-400">(Medium)</span></h2>
+              <p className="text-base text-gray-200">Leading manufacturers are rolling out AI-powered robots for logistics, healthcare, and manufacturing, accelerating the adoption of automation worldwide.</p>
             </div>
-          </div>
+            <div>
+              <h2 className="text-2xl font-bold text-blue-300 mb-1">Breakthrough in AI image generation <span className="text-xs text-gray-400">(X)</span></h2>
+              <p className="text-base text-gray-200">A new generative model can create photorealistic images from text prompts, pushing the boundaries of creative AI applications.</p>
+            </div>
+            <a href="#" className="mt-2 text-blue-400 hover:underline font-semibold">See all news →</a>
+          </article>
         </section>
-        <a href="#contact" className="mt-8 px-10 py-4 rounded-full bg-gradient-to-r from-cyan-500 to-pink-500 hover:from-pink-500 hover:to-cyan-400 text-white font-semibold text-xl shadow-xl transition-all duration-300 drop-shadow-lg">Get Started</a>
+        {/* Tutorials - 右侧一列 */}
+        <aside id="tutorials" className="md:col-span-1 flex flex-col gap-8">
+          <h1 className="text-3xl font-bold text-white mb-4 border-l-4 border-pink-500 pl-4">AI Tutorials</h1>
+          <ul className="flex flex-col gap-4">
+            <li>
+              <span className="text-lg font-semibold text-pink-300">Beginner:</span>
+              <span className="ml-2 text-gray-200">What is Machine Learning?</span>
+            </li>
+            <li>
+              <span className="text-lg font-semibold text-pink-300">Intermediate:</span>
+              <span className="ml-2 text-gray-200">Build your first AI chatbot</span>
+            </li>
+            <li>
+              <span className="text-lg font-semibold text-pink-300">Advanced:</span>
+              <span className="ml-2 text-gray-200">Fine-tune LLMs with your data</span>
+            </li>
+            <li>
+              <span className="text-lg font-semibold text-pink-300">Pro:</span>
+              <span className="ml-2 text-gray-200">Deploy AI models at scale</span>
+            </li>
+          </ul>
+          <a href="#" className="mt-2 text-pink-400 hover:underline font-semibold">Explore tutorials →</a>
+        </aside>
       </main>
-      {/* Footer with Contact */}
-      <footer className="relative z-10 w-full py-8 px-4 flex flex-col items-center gap-2 bg-blue-950/90 backdrop-blur-md" id="contact">
+      {/* 底部区域 */}
+      <footer className="w-full border-t border-gray-800 bg-gray-950/90 py-8 px-4 flex flex-col items-center gap-2">
         <div className="flex items-center gap-2 mb-2">
-          <Logo size={28} />
-          <span className="font-bold text-xl text-blue-100">Airoam</span>
-          <span className="text-cyan-200">© {new Date().getFullYear()}</span>
+          <Logo size={24} />
+          <span className="font-bold text-lg text-white">Airoam</span>
+          <span className="text-gray-400">© {new Date().getFullYear()}</span>
         </div>
-        <div className="text-cyan-100">Contact: <a href="mailto:Airoam@gmail.com" className="underline hover:text-cyan-300">Airoam@gmail.com</a></div>
-        <div className="mt-4 w-full flex justify-center">
-          <ContactForm />
-        </div>
+        <div className="text-gray-300">Contact: <a href="mailto:Airoam@gmail.com" className="underline hover:text-blue-400">Airoam@gmail.com</a></div>
       </footer>
     </div>
   );
