@@ -1,359 +1,366 @@
 'use client';
-import { useEffect, useState } from "react";
-import Link from "next/link";
-import Logo from "../components/Logo";
-import ContactForm from "../components/ContactForm";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faBookOpen, faUsers, faArrowRight, faClock, faRocket, faBrain, faGlobe, faChartLine } from "@fortawesome/free-solid-svg-icons";
 
-interface NewsItem {
-  title: string;
-  excerpt: string;
-  category: string;
-  source: string;
-  time: string;
-  url: string;
-  image: string;
-  content?: string;
-}
+import React, { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { 
+  faBrain, 
+  faRocket, 
+  faStore, 
+  faUsers, 
+  faGraduationCap,
+  faChartLine,
+  faLightbulb,
+  faCog,
+  faPlay,
+  faArrowRight,
+  faStar,
+  faFire,
+  faCrown,
+  faShieldAlt,
+  faGlobe,
+  faMicrochip
+} from '@fortawesome/free-solid-svg-icons';
+import AIHeader from '../components/AIHeader';
+import Link from 'next/link';
 
-interface UserStats {
-  total_users: number;
-  recent_users: number;
-  community_stats: {
-    discord_members: { count: number; status: string };
-    reddit_members: { count: number; status: string };
-    twitter_followers: { count: number; status: string };
-  };
-}
-
-export default function Home() {
-  const [newsData, setNewsData] = useState<NewsItem[]>([]);
-  const [userStats, setUserStats] = useState<UserStats | null>(null);
-  const [loading, setLoading] = useState(true);
-
-  // API base URL - use environment variable or fallback to localhost for development
-  const API_BASE = process.env.NEXT_PUBLIC_API_BASE || 'http://localhost:8000';
+const HomePage: React.FC = () => {
+  const [currentFeature, setCurrentFeature] = useState(0);
+  const [isVisible, setIsVisible] = useState(false);
 
   useEffect(() => {
-    // Fetch real news data
-    const fetchNews = async () => {
-      try {
-        const response = await fetch(`${API_BASE}/api/news/`);
-        if (response.ok) {
-          const data = await response.json();
-          setNewsData(data.news || []);
-        }
-      } catch (error) {
-        console.error('Failed to fetch news:', error);
-      }
-    };
+    setIsVisible(true);
+    const interval = setInterval(() => {
+      setCurrentFeature((prev) => (prev + 1) % 4);
+    }, 3000);
+    return () => clearInterval(interval);
+  }, []);
 
-    // Fetch user statistics
-    const fetchStats = async () => {
-      try {
-        const response = await fetch(`${API_BASE}/api/stats/`);
-        if (response.ok) {
-          const data = await response.json();
-          setUserStats(data);
-        }
-      } catch (error) {
-        console.error('Failed to fetch stats:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
+  const features = [
+    {
+      icon: faStore,
+      title: 'AI工具商城',
+      description: '集成全球顶尖AI工具，按需组合，按次计费',
+      color: 'from-blue-500 to-cyan-500'
+    },
+    {
+      icon: faUsers,
+      title: '智能社区',
+      description: 'NLP精准推荐，AI问答机器人，内容创作助手',
+      color: 'from-purple-500 to-pink-500'
+    },
+    {
+      icon: faRocket,
+      title: '企业方案',
+      description: '定制化AI解决方案，从诊断到实施全流程服务',
+      color: 'from-green-500 to-emerald-500'
+    },
+    {
+      icon: faGraduationCap,
+      title: 'AI学院',
+      description: 'VR虚拟实验室，AI评估系统，人才孵化基地',
+      color: 'from-orange-500 to-red-500'
+    }
+  ];
 
-    fetchNews();
-    fetchStats();
-  }, [API_BASE]);
+  const aiTools = [
+    {
+      name: '智能文案生成器',
+      description: '基于GPT-4的智能文案创作工具',
+      price: '¥2/次',
+      rating: 4.9,
+      users: '50K+',
+      category: '文字生成',
+      hot: true
+    },
+    {
+      name: 'AI图像创作',
+      description: 'DALL-E 3驱动的图像生成平台',
+      price: '¥5/次',
+      rating: 4.8,
+      users: '30K+',
+      category: '图像创作',
+      hot: true
+    },
+    {
+      name: '智能数据分析',
+      description: '自动数据清洗、分析和可视化',
+      price: '¥10/次',
+      rating: 4.7,
+      users: '20K+',
+      category: '数据分析',
+      hot: false
+    },
+    {
+      name: '代码助手',
+      description: 'AI驱动的代码生成和优化工具',
+      price: '¥3/次',
+      rating: 4.9,
+      users: '40K+',
+      category: '编程开发',
+      hot: true
+    }
+  ];
+
+  const stats = [
+    { number: '5000万+', label: '注册用户' },
+    { number: '50亿元', label: '年度营收' },
+    { number: '1000+', label: 'AI工具' },
+    { number: '99.9%', label: '系统可用性' }
+  ];
 
   return (
-    <div className="min-h-screen w-full bg-gradient-to-br from-slate-900 via-slate-800 to-indigo-900 text-slate-100 font-sans">
-      {/* Header Navigation */}
-      <header className="w-full flex items-center justify-between px-6 lg:px-8 py-4 border-b border-slate-700/50 bg-slate-900/95 backdrop-blur-sm sticky top-0 z-20">
-        <div className="flex items-center gap-3">
-          <Logo size={32} />
-          <span className="text-xl lg:text-2xl font-bold tracking-wide text-white bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">Airoam</span>
-        </div>
-        <nav className="hidden md:flex gap-6 lg:gap-8 text-sm lg:text-base font-medium">
-          <a href="#news" className="hover:text-blue-400 transition-colors duration-200 relative group">
-            AI News
-            <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-blue-400 transition-all duration-200 group-hover:w-full"></span>
-          </a>
-          <a href="#tutorials" className="hover:text-purple-400 transition-colors duration-200 relative group">
-            Tutorials
-            <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-purple-400 transition-all duration-200 group-hover:w-full"></span>
-          </a>
-          <a href="#community" className="hover:text-green-400 transition-colors duration-200 relative group">
-            Community
-            <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-green-400 transition-all duration-200 group-hover:w-full"></span>
-          </a>
-          <a href="#contact" className="hover:text-orange-400 transition-colors duration-200 relative group">
-            Contact
-            <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-orange-400 transition-all duration-200 group-hover:w-full"></span>
-          </a>
-        </nav>
-        <div className="flex items-center gap-4">
-          <a href="/login" className="text-blue-400 hover:text-blue-300 font-medium transition-colors">Login</a>
-          <a href="/register" className="px-4 py-2 bg-gradient-to-r from-blue-500 to-purple-500 text-white font-semibold rounded-lg hover:from-blue-600 hover:to-purple-600 transition-all duration-200">
-            Sign Up
-          </a>
-        </div>
-        <button className="md:hidden text-white">
-          <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-          </svg>
-        </button>
-      </header>
-
-      {/* Company Introduction Animation Area */}
+    <div className="min-h-screen bg-black text-white">
+      <AIHeader />
+      
+      {/* Hero Section */}
       <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
-        {/* Background Animation Elements */}
+        {/* Background Animation */}
         <div className="absolute inset-0">
-          <div className="absolute top-20 left-20 w-32 h-32 bg-blue-500/20 rounded-full animate-pulse"></div>
-          <div className="absolute top-40 right-32 w-24 h-24 bg-purple-500/20 rounded-full animate-ping"></div>
-          <div className="absolute bottom-32 left-32 w-40 h-40 bg-pink-500/20 rounded-full animate-bounce"></div>
-          <div className="absolute bottom-20 right-20 w-28 h-28 bg-green-500/20 rounded-full animate-spin"></div>
+          <div className="absolute inset-0 bg-gradient-to-br from-black via-gray-900 to-black"></div>
+          <div className="absolute inset-0 bg-[url('data:image/svg+xml,%3Csvg width="60" height="60" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg"%3E%3Cg fill="none" fill-rule="evenodd"%3E%3Cg fill="%2300ffff" fill-opacity="0.1"%3E%3Ccircle cx="30" cy="30" r="1"/%3E%3C/g%3E%3C/g%3E%3C/svg%3E')] opacity-20"></div>
         </div>
-        
-        <div className="relative z-10 text-center max-w-6xl mx-auto px-4">
-          <div className="mb-8">
-            <Logo size={120} />
-          </div>
-          
-          <h1 className="text-5xl lg:text-7xl font-extrabold mb-6">
-            <span className="bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 bg-clip-text text-transparent animate-pulse">
-              Airoam
-            </span>
-          </h1>
-          
-          <div className="text-2xl lg:text-3xl font-bold text-white mb-8 animate-fade-in">
-            <span className="inline-block animate-slide-up">Leading Global</span>
-            <span className="inline-block animate-slide-up delay-200">AI News Platform</span>
-          </div>
-          
-          <p className="text-lg lg:text-xl text-slate-300 mb-12 max-w-4xl mx-auto leading-relaxed animate-fade-in delay-500">
-            Aggregating the latest AI technology trends, research breakthroughs, and industry insights worldwide. 
-            We connect every corner of the AI world, making knowledge accessible without boundaries.
-          </p>
-          
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
-            <div className="bg-slate-800/50 backdrop-blur-sm rounded-2xl p-6 border border-slate-700/50 hover:border-blue-500/50 transition-all duration-300 group">
-              <FontAwesomeIcon icon={faRocket} className="w-12 h-12 text-blue-400 mb-4 group-hover:scale-110 transition-transform" />
-              <h3 className="text-xl font-bold text-white mb-2">Real-time Updates</h3>
-              <p className="text-slate-300">24/7 continuous updates, get the latest AI developments first</p>
+
+        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <motion.div
+            initial={{ opacity: 0, y: 50 }}
+            animate={{ opacity: isVisible ? 1 : 0, y: isVisible ? 0 : 50 }}
+            transition={{ duration: 1 }}
+          >
+            <h1 className="text-5xl md:text-7xl font-bold mb-6">
+              <span className="bg-gradient-to-r from-cyan-400 via-green-400 to-blue-400 bg-clip-text text-transparent">
+                让AI技术普惠化
+              </span>
+            </h1>
+            <p className="text-xl md:text-2xl text-gray-300 mb-8 max-w-3xl mx-auto">
+              链接全球科技资源，打造集AI工具应用、科技内容生态、产业资源对接于一体的综合性科技AI服务平台
+            </p>
+            
+            <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12">
+              <motion.button
+                className="px-8 py-4 bg-gradient-to-r from-cyan-400 to-green-400 text-black font-bold rounded-lg text-lg hover:from-cyan-500 hover:to-green-500 transition-all duration-300 transform hover:scale-105"
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+              >
+                立即体验
+              </motion.button>
+              <motion.button
+                className="px-8 py-4 border-2 border-cyan-400 text-cyan-400 font-bold rounded-lg text-lg hover:bg-cyan-400 hover:text-black transition-all duration-300"
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+              >
+                观看演示
+              </motion.button>
             </div>
-            <div className="bg-slate-800/50 backdrop-blur-sm rounded-2xl p-6 border border-slate-700/50 hover:border-purple-500/50 transition-all duration-300 group">
-              <FontAwesomeIcon icon={faBrain} className="w-12 h-12 text-purple-400 mb-4 group-hover:scale-110 transition-transform" />
-              <h3 className="text-xl font-bold text-white mb-2">Deep Analysis</h3>
-              <p className="text-slate-300">Professional team insights with unique perspectives and trend predictions</p>
+
+            {/* Stats */}
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-8 max-w-4xl mx-auto">
+              {stats.map((stat, index) => (
+                <motion.div
+                  key={index}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: isVisible ? 1 : 0, y: isVisible ? 0 : 20 }}
+                  transition={{ duration: 0.5, delay: index * 0.1 }}
+                  className="text-center"
+                >
+                  <div className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-cyan-400 to-green-400 bg-clip-text text-transparent">
+                    {stat.number}
+                  </div>
+                  <div className="text-gray-400 text-sm md:text-base">
+                    {stat.label}
+                  </div>
+                </motion.div>
+              ))}
             </div>
-            <div className="bg-slate-800/50 backdrop-blur-sm rounded-2xl p-6 border border-slate-700/50 hover:border-green-500/50 transition-all duration-300 group">
-              <FontAwesomeIcon icon={faGlobe} className="w-12 h-12 text-green-400 mb-4 group-hover:scale-110 transition-transform" />
-              <h3 className="text-xl font-bold text-white mb-2">Global Vision</h3>
-              <p className="text-slate-300">Covering global AI ecosystem, connecting top research institutions</p>
-            </div>
-          </div>
-          
-          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-            <a href="/register" className="px-8 py-4 bg-gradient-to-r from-blue-500 to-purple-500 text-white font-bold text-lg rounded-full hover:from-blue-600 hover:to-purple-600 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105">
-              Subscribe Now
-            </a>
-            <a href="#news" className="px-8 py-4 border-2 border-slate-600 text-white font-bold text-lg rounded-full hover:border-blue-400 hover:text-blue-400 transition-all duration-200">
-              Explore News
-            </a>
-          </div>
+          </motion.div>
         </div>
-        
-        {/* Scroll Indicator */}
-        <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 animate-bounce">
-          <FontAwesomeIcon icon={faArrowRight} className="w-6 h-6 text-slate-400 rotate-90" />
+
+        {/* Floating Elements */}
+        <motion.div
+          className="absolute top-20 left-10 w-20 h-20 bg-cyan-400/20 rounded-full blur-xl"
+          animate={{
+            x: [0, 100, 0],
+            y: [0, -50, 0],
+          }}
+          transition={{
+            duration: 8,
+            repeat: Infinity,
+            ease: "easeInOut"
+          }}
+        />
+        <motion.div
+          className="absolute bottom-20 right-10 w-32 h-32 bg-green-400/20 rounded-full blur-xl"
+          animate={{
+            x: [0, -100, 0],
+            y: [0, 50, 0],
+          }}
+          transition={{
+            duration: 10,
+            repeat: Infinity,
+            ease: "easeInOut"
+          }}
+        />
+      </section>
+
+      {/* Features Section */}
+      <section className="py-20 bg-gray-900/50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <motion.div
+            initial={{ opacity: 0, y: 50 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
+            className="text-center mb-16"
+          >
+            <h2 className="text-4xl md:text-5xl font-bold mb-6">
+              核心功能模块
+            </h2>
+            <p className="text-xl text-gray-300 max-w-3xl mx-auto">
+              四大核心模块，全方位满足个人、企业、科研机构的不同需求
+            </p>
+          </motion.div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+            {features.map((feature, index) => (
+              <motion.div
+                key={index}
+                initial={{ opacity: 0, y: 50 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: index * 0.1 }}
+                className="relative group"
+              >
+                <div className={`absolute inset-0 bg-gradient-to-r ${feature.color} rounded-2xl blur-xl opacity-20 group-hover:opacity-40 transition-opacity duration-300`}></div>
+                <div className="relative bg-gray-800/50 backdrop-blur-sm border border-gray-700 rounded-2xl p-8 h-full hover:border-cyan-400/50 transition-all duration-300">
+                  <div className={`w-16 h-16 bg-gradient-to-r ${feature.color} rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300`}>
+                    <FontAwesomeIcon icon={feature.icon} className="text-2xl text-white" />
+                  </div>
+                  <h3 className="text-2xl font-bold mb-4">{feature.title}</h3>
+                  <p className="text-gray-400 leading-relaxed">{feature.description}</p>
+                </div>
+              </motion.div>
+            ))}
+          </div>
         </div>
       </section>
 
-      {/* Main Content Area */}
-      <main className="max-w-7xl mx-auto px-4 lg:px-8 py-8">
-        {/* News Grid Layout */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* AI News - Left Two Columns */}
-          <section id="news" className="lg:col-span-2">
-            <h2 className="text-3xl font-bold text-white mb-8 flex items-center gap-3">
-              <FontAwesomeIcon icon={faChartLine} className="w-8 h-8 text-blue-400" />
-              Latest AI News
+      {/* AI Tools Section */}
+      <section className="py-20">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <motion.div
+            initial={{ opacity: 0, y: 50 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
+            className="text-center mb-16"
+          >
+            <h2 className="text-4xl md:text-5xl font-bold mb-6">
+              热门AI工具
             </h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {loading ? (
-                // Loading state
-                Array.from({ length: 8 }).map((_, index) => (
-                  <div key={index} className="bg-slate-800/50 backdrop-blur-sm rounded-2xl p-6 border border-slate-700/50 animate-pulse">
-                    <div className="h-4 bg-slate-700 rounded mb-3"></div>
-                    <div className="h-6 bg-slate-700 rounded mb-2"></div>
-                    <div className="h-4 bg-slate-700 rounded mb-2"></div>
-                    <div className="h-4 bg-slate-700 rounded w-3/4"></div>
-                  </div>
-                ))
-              ) : (
-                // Real news data - Show 50 items
-                newsData.slice(0, 50).map((news, index) => (
-                  <article key={index} className="bg-slate-800/50 backdrop-blur-sm rounded-2xl p-6 border border-slate-700/50 hover:border-blue-500/50 transition-all duration-300 hover:shadow-2xl hover:shadow-blue-500/10 group">
-                    <div className="flex items-center gap-2 mb-3">
-                      <span className={`px-3 py-1 text-xs font-semibold rounded-full ${
-                        news.category === "Breaking" ? "bg-red-500/20 text-red-300" :
-                        news.category === "Research" ? "bg-purple-500/20 text-purple-300" :
-                        news.category === "Industry" ? "bg-green-500/20 text-green-300" :
-                        news.category === "Creative AI" ? "bg-pink-500/20 text-pink-300" :
-                        "bg-orange-500/20 text-orange-300"
-                      }`}>
-                        {news.category}
-                      </span>
-                      <span className="text-slate-400 text-xs flex items-center gap-1">
-                        <FontAwesomeIcon icon={faClock} className="w-3 h-3" />
-                        {news.time}
-                      </span>
-                    </div>
-                    <h3 className="text-xl font-bold text-white mb-3 group-hover:text-blue-300 transition-colors">
-                      {news.title}
-                    </h3>
-                    <p className="text-slate-300 text-sm leading-relaxed mb-4">
-                      {news.excerpt}
-                    </p>
-                    <div className="flex items-center justify-between">
-                      <span className="text-xs text-slate-400">Source: {news.source}</span>
-                                      <Link href={`/news/${index}`} className="text-blue-400 hover:text-blue-300 font-medium text-sm transition-colors">
-                  Read Full Article →
-                </Link>
-                    </div>
-                  </article>
-                ))
-              )}
-            </div>
-            
-            <div className="mt-8 text-center">
-              <Link href="/news" className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-500 to-purple-500 text-white font-semibold rounded-full hover:from-blue-600 hover:to-purple-600 transition-all duration-200 shadow-lg hover:shadow-xl">
-                View All News
-                <FontAwesomeIcon icon={faArrowRight} className="w-4 h-4" />
-              </Link>
-            </div>
-          </section>
+            <p className="text-xl text-gray-300 max-w-3xl mx-auto">
+              精选全球顶尖AI工具，助力您的工作和生活
+            </p>
+          </motion.div>
 
-          {/* Sidebar */}
-          <aside className="lg:col-span-1 space-y-6">
-            {/* Subscription Area */}
-            <div className="bg-slate-800/50 backdrop-blur-sm rounded-2xl p-6 border border-slate-700/50">
-              <h3 className="text-xl font-bold text-white mb-4 flex items-center gap-3">
-                <FontAwesomeIcon icon={faRocket} className="w-6 h-6 text-orange-400" />
-                Premium Subscription
-              </h3>
-              <p className="text-slate-300 text-sm mb-4">Get exclusive AI news and premium content</p>
-              <div className="mb-4 p-4 bg-gradient-to-r from-orange-500/20 to-red-500/20 rounded-lg">
-                <div className="text-2xl font-bold text-white">$9.99</div>
-                <div className="text-slate-300 text-sm">per month</div>
-              </div>
-              <button 
-                className="w-full px-4 py-3 bg-gradient-to-r from-orange-500 to-red-500 text-white font-semibold rounded-lg hover:from-orange-600 hover:to-red-600 transition-all duration-200"
-                onClick={() => window.location.href = '/subscribe'}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {aiTools.map((tool, index) => (
+              <motion.div
+                key={index}
+                initial={{ opacity: 0, y: 50 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: index * 0.1 }}
+                className="group"
               >
-                Subscribe Now
-              </button>
-            </div>
-
-            {/* AI Tutorials */}
-            <div className="bg-slate-800/50 backdrop-blur-sm rounded-2xl p-6 border border-slate-700/50">
-              <h3 className="text-xl font-bold text-white mb-4 flex items-center gap-3">
-                <FontAwesomeIcon icon={faBookOpen} className="w-6 h-6 text-purple-400" />
-                AI Tutorials
-              </h3>
-              <div className="space-y-3">
-                <div className="group cursor-pointer">
-                  <div className="flex items-center gap-3 p-3 rounded-lg hover:bg-slate-700/50 transition-colors">
-                    <span className="px-2 py-1 bg-green-500/20 text-green-300 text-xs font-semibold rounded">Beginner</span>
-                    <span className="text-slate-200 group-hover:text-white transition-colors text-sm">What is Machine Learning?</span>
+                <div className="bg-gray-800/50 backdrop-blur-sm border border-gray-700 rounded-2xl p-6 hover:border-cyan-400/50 transition-all duration-300 hover:transform hover:scale-105">
+                  <div className="flex items-center justify-between mb-4">
+                    <span className="text-sm text-gray-400 bg-gray-700 px-3 py-1 rounded-full">
+                      {tool.category}
+                    </span>
+                    {tool.hot && (
+                      <FontAwesomeIcon icon={faFire} className="text-orange-400 text-sm" />
+                    )}
+                  </div>
+                  
+                  <h3 className="text-xl font-bold mb-2 group-hover:text-cyan-400 transition-colors duration-300">
+                    {tool.name}
+                  </h3>
+                  <p className="text-gray-400 text-sm mb-4">
+                    {tool.description}
+                  </p>
+                  
+                  <div className="flex items-center justify-between mb-4">
+                    <div className="flex items-center space-x-1">
+                      <FontAwesomeIcon icon={faStar} className="text-yellow-400 text-sm" />
+                      <span className="text-sm text-gray-300">{tool.rating}</span>
+                    </div>
+                    <span className="text-sm text-gray-400">{tool.users} 用户</span>
+                  </div>
+                  
+                  <div className="flex items-center justify-between">
+                    <span className="text-lg font-bold text-cyan-400">{tool.price}</span>
+                    <motion.button
+                      className="px-4 py-2 bg-gradient-to-r from-cyan-400 to-green-400 text-black font-semibold rounded-lg text-sm hover:from-cyan-500 hover:to-green-500 transition-all duration-200"
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                    >
+                      立即使用
+                    </motion.button>
                   </div>
                 </div>
-                <div className="group cursor-pointer">
-                  <div className="flex items-center gap-3 p-3 rounded-lg hover:bg-slate-700/50 transition-colors">
-                    <span className="px-2 py-1 bg-yellow-500/20 text-yellow-300 text-xs font-semibold rounded">Intermediate</span>
-                    <span className="text-slate-200 group-hover:text-white transition-colors text-sm">Build Your First AI Chatbot</span>
-                  </div>
-                </div>
-                <div className="group cursor-pointer">
-                  <div className="flex items-center gap-3 p-3 rounded-lg hover:bg-slate-700/50 transition-colors">
-                    <span className="px-2 py-1 bg-orange-500/20 text-orange-300 text-xs font-semibold rounded">Advanced</span>
-                    <span className="text-slate-200 group-hover:text-white transition-colors text-sm">Fine-tune LLMs with Your Data</span>
-                  </div>
-                </div>
-              </div>
-              <div className="mt-4">
-                <a href="/tutorials" className="inline-flex items-center gap-2 text-purple-400 hover:text-purple-300 font-semibold transition-colors text-sm">
-                  Explore Tutorials
-                  <FontAwesomeIcon icon={faArrowRight} className="w-3 h-3" />
-                </a>
-              </div>
-            </div>
-
-            {/* Community */}
-            <div className="bg-slate-800/50 backdrop-blur-sm rounded-2xl p-6 border border-slate-700/50">
-              <h3 className="text-xl font-bold text-white mb-4 flex items-center gap-3">
-                <FontAwesomeIcon icon={faUsers} className="w-6 h-6 text-green-400" />
-                Community
-              </h3>
-              <div className="space-y-3">
-                <div className="flex items-center justify-between p-3 bg-slate-700/30 rounded-lg">
-                  <span className="text-slate-200 text-sm">Discord</span>
-                  <span className="text-green-400 text-sm">
-                    {userStats?.community_stats.discord_members.count || 0} members
-                  </span>
-                </div>
-                <div className="flex items-center justify-between p-3 bg-slate-700/30 rounded-lg">
-                  <span className="text-slate-200 text-sm">Reddit</span>
-                  <span className="text-green-400 text-sm">
-                    {userStats?.community_stats.reddit_members.count || 0} members
-                  </span>
-                </div>
-                <div className="flex items-center justify-between p-3 bg-slate-700/30 rounded-lg">
-                  <span className="text-slate-200 text-sm">Twitter</span>
-                  <span className="text-green-400 text-sm">
-                    {userStats?.community_stats.twitter_followers.count || 0} followers
-                  </span>
-                </div>
-                {userStats && (
-                  <div className="flex items-center justify-between p-3 bg-blue-500/20 rounded-lg">
-                    <span className="text-slate-200 text-sm">Registered Users</span>
-                    <span className="text-blue-400 text-sm">{userStats.total_users} users</span>
-                  </div>
-                )}
-              </div>
-            </div>
-
-            {/* Contact Form */}
-            <div id="contact">
-              <ContactForm />
-            </div>
-          </aside>
-        </div>
-      </main>
-
-      {/* Footer Area */}
-      <footer className="w-full border-t border-slate-700/50 bg-slate-900/95 backdrop-blur-sm py-8 px-4 mt-8">
-        <div className="max-w-7xl mx-auto flex flex-col lg:flex-row items-center justify-between gap-4">
-          <div className="flex items-center gap-3">
-            <Logo size={28} />
-            <div>
-              <span className="font-bold text-lg text-white bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">Airoam</span>
-              <div className="text-slate-400 text-sm">© {new Date().getFullYear()} All rights reserved</div>
-            </div>
+              </motion.div>
+            ))}
           </div>
-          <div className="flex flex-col items-center lg:items-end gap-2">
-            <div className="text-slate-300">Contact: <a href="mailto:airoam.net@gmail.com" className="text-blue-400 hover:text-blue-300 underline transition-colors">airoam.net@gmail.com</a></div>
-            <div className="flex gap-4 text-slate-400">
-              <a href="/privacy" className="hover:text-white transition-colors">Privacy Policy</a>
-              <a href="/terms" className="hover:text-white transition-colors">Terms of Service</a>
-              <a href="/about" className="hover:text-white transition-colors">About Us</a>
-            </div>
-          </div>
+
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.5 }}
+            className="text-center mt-12"
+          >
+            <Link
+              href="/tools"
+              className="inline-flex items-center space-x-2 px-8 py-4 border-2 border-cyan-400 text-cyan-400 font-bold rounded-lg hover:bg-cyan-400 hover:text-black transition-all duration-300"
+            >
+              <span>查看全部工具</span>
+              <FontAwesomeIcon icon={faArrowRight} className="text-sm" />
+            </Link>
+          </motion.div>
         </div>
-      </footer>
+      </section>
+
+      {/* CTA Section */}
+      <section className="py-20 bg-gradient-to-r from-gray-900 to-black">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <motion.div
+            initial={{ opacity: 0, y: 50 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
+          >
+            <h2 className="text-4xl md:text-5xl font-bold mb-6">
+              加入AI科技革命
+            </h2>
+            <p className="text-xl text-gray-300 mb-8 max-w-3xl mx-auto">
+              成为全球5000万用户中的一员，体验最前沿的AI技术，开启智能化未来
+            </p>
+            
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <motion.button
+                className="px-8 py-4 bg-gradient-to-r from-cyan-400 to-green-400 text-black font-bold rounded-lg text-lg hover:from-cyan-500 hover:to-green-500 transition-all duration-300"
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+              >
+                免费注册
+              </motion.button>
+              <motion.button
+                className="px-8 py-4 border-2 border-cyan-400 text-cyan-400 font-bold rounded-lg text-lg hover:bg-cyan-400 hover:text-black transition-all duration-300"
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+              >
+                了解更多
+              </motion.button>
+            </div>
+          </motion.div>
+        </div>
+      </section>
     </div>
   );
-}
+};
+
+export default HomePage;
