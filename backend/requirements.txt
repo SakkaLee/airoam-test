@@ -4,3 +4,4 @@ djangorestframework>=3.16
 django-cors-headers>=4.3 
 stripe>=8.0 
 gunicorn 
+djangorestframework-simplejwt 
