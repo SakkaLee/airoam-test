@@ -1,6 +1,11 @@
-import React from "react";
+import React from 'react';
 
-export default function Logo({ size = 40 }: { size?: number }) {
+interface LogoProps {
+  size?: number;
+  className?: string;
+}
+
+const Logo: React.FC<LogoProps> = ({ size = 32, className = "" }) => {
   return (
     <svg
       width={size}
@@ -8,32 +13,91 @@ export default function Logo({ size = 40 }: { size?: number }) {
       viewBox="0 0 64 64"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
-      style={{ maxWidth: "100%", height: "auto" }}
-      aria-label="Airoam Logo"
+      className={className}
     >
+      {/* Background Circle with Gradient */}
       <defs>
-        <radialGradient id="mystic" cx="50%" cy="50%" r="50%">
-          <stop offset="0%" stopColor="#60a5fa" />
-          <stop offset="60%" stopColor="#312e81" />
-          <stop offset="100%" stopColor="#0f172a" />
-        </radialGradient>
-        <linearGradient id="glow" x1="0" y1="0" x2="64" y2="64" gradientUnits="userSpaceOnUse">
-          <stop stopColor="#a5b4fc" />
-          <stop offset="1" stopColor="#38bdf8" />
+        <linearGradient id="logoGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stopColor="#3B82F6" />
+          <stop offset="50%" stopColor="#8B5CF6" />
+          <stop offset="100%" stopColor="#EC4899" />
+        </linearGradient>
+        <linearGradient id="innerGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stopColor="#1E40AF" />
+          <stop offset="100%" stopColor="#7C3AED" />
         </linearGradient>
       </defs>
-      <circle cx="32" cy="32" r="30" fill="url(#mystic)" />
-      <ellipse cx="32" cy="32" rx="18" ry="8" fill="url(#glow)" opacity="0.4">
-        <animate attributeName="rx" values="18;24;18" dur="2s" repeatCount="indefinite" />
-      </ellipse>
-      <path d="M20 44 Q32 20 44 44" stroke="#38bdf8" strokeWidth="3" fill="none" filter="url(#shadow)"/>
-      <circle cx="32" cy="32" r="6" fill="#fff" opacity="0.7">
-        <animate attributeName="r" values="6;9;6" dur="2s" repeatCount="indefinite" />
-      </circle>
-      <circle cx="32" cy="32" r="2" fill="#38bdf8" />
-      <path d="M32 26 Q36 32 32 38 Q28 32 32 26" fill="#38bdf8" opacity="0.7">
-        <animateTransform attributeName="transform" type="rotate" from="0 32 32" to="360 32 32" dur="4s" repeatCount="indefinite" />
-      </path>
+      
+      {/* Outer Ring */}
+      <circle
+        cx="32"
+        cy="32"
+        r="30"
+        stroke="url(#logoGradient)"
+        strokeWidth="2"
+        fill="none"
+        className="animate-pulse"
+      />
+      
+      {/* Inner Hexagon */}
+      <polygon
+        points="32,8 44,16 44,32 32,40 20,32 20,16"
+        fill="url(#innerGradient)"
+        stroke="url(#logoGradient)"
+        strokeWidth="1.5"
+      />
+      
+      {/* AI Brain Circuit Pattern */}
+      <g stroke="#60A5FA" strokeWidth="1" fill="none" opacity="0.8">
+        {/* Circuit Lines */}
+        <path d="M26 20 L38 20" />
+        <path d="M26 28 L38 28" />
+        <path d="M26 36 L38 36" />
+        <path d="M32 16 L32 44" />
+        
+        {/* Circuit Nodes */}
+        <circle cx="26" cy="20" r="1.5" fill="#60A5FA" />
+        <circle cx="38" cy="20" r="1.5" fill="#60A5FA" />
+        <circle cx="26" cy="28" r="1.5" fill="#60A5FA" />
+        <circle cx="38" cy="28" r="1.5" fill="#60A5FA" />
+        <circle cx="26" cy="36" r="1.5" fill="#60A5FA" />
+        <circle cx="38" cy="36" r="1.5" fill="#60A5FA" />
+        <circle cx="32" cy="16" r="1.5" fill="#60A5FA" />
+        <circle cx="32" cy="44" r="1.5" fill="#60A5FA" />
+      </g>
+      
+      {/* Central AI Symbol */}
+      <text
+        x="32"
+        y="38"
+        textAnchor="middle"
+        fill="white"
+        fontSize="12"
+        fontWeight="bold"
+        fontFamily="Arial, sans-serif"
+      >
+        AI
+      </text>
+      
+      {/* Animated Dots */}
+      <circle
+        cx="32"
+        cy="32"
+        r="2"
+        fill="#10B981"
+        className="animate-ping"
+        style={{ animationDelay: '0s' }}
+      />
+      <circle
+        cx="32"
+        cy="32"
+        r="1"
+        fill="#10B981"
+        className="animate-ping"
+        style={{ animationDelay: '0.5s' }}
+      />
     </svg>
   );
-} 
+};
+
+export default Logo; 
