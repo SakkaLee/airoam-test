@@ -129,7 +129,7 @@ const HomePage: React.FC = () => {
           >
             <h1 className="text-5xl md:text-7xl font-bold mb-6">
               <span className="bg-gradient-to-r from-cyan-400 via-green-400 to-blue-400 bg-clip-text text-transparent">
-                让AI技术普惠化
+                让AI技术普惠化 - 2025新版本
               </span>
             </h1>
             <p className="text-xl md:text-2xl text-gray-300 mb-8 max-w-3xl mx-auto">
