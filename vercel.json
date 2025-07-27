@@ -1,15 +1,15 @@
 {
   "version": 2,
-  "buildCommand": "cd frontend && npm install && npm run build",
-  "outputDirectory": "frontend/.next",
-  "installCommand": "cd frontend && npm install",
-  "framework": "nextjs",
-  "functions": {
-    "frontend/.next/server/**/*.js": {
-      "runtime": "nodejs18.x"
+  "builds": [
+    {
+      "src": "frontend/package.json",
+      "use": "@vercel/next"
     }
-  },
-  "env": {
-    "NEXT_PUBLIC_SITE_URL": "https://www.airoam.net"
-  }
+  ],
+  "routes": [
+    {
+      "src": "/(.*)",
+      "dest": "/frontend/$1"
+    }
+  ]
 } 
