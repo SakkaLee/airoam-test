@@ -3,9 +3,12 @@ name: Deploy Frontend
 on:
   push:
     branches: [main]
+    paths:
+      - 'frontend/**'
+      - '.github/workflows/deploy-frontend.yml'
 
 jobs:
-  deploy:
+  build:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -20,17 +23,14 @@ jobs:
       - name: Install dependencies
         run: |
           cd frontend
-          npm ci
+          npm ci --legacy-peer-deps
       
       - name: Build
         run: |
           cd frontend
           npm run build
       
-      - name: Deploy to Vercel
-        if: success()
+      - name: Build Status
         run: |
-          echo "Frontend deployment completed successfully"
-          # 这里可以添加实际的Vercel部署命令
-          # npm i -g vercel
-          # vercel --prod --token=${{ secrets.VERCEL_TOKEN }} 
+          echo "✅ Frontend build completed successfully"
+          echo "🚀 Vercel will automatically deploy from GitHub" 
