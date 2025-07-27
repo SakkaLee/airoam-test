@@ -9,13 +9,11 @@ import {
   faClock,
   faUser,
   faStar,
-  faBook,
   faLaptop,
   faVrCardboard,
   faChartBar,
   faTrophy,
   faArrowRight,
-  faFilter,
   faSearch
 } from '@fortawesome/free-solid-svg-icons';
 import AIHeader from '../../components/AIHeader';

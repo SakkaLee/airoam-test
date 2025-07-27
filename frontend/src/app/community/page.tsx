@@ -4,14 +4,12 @@ import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { 
-  faUsers, 
   faComments,
   faLightbulb,
   faShare,
   faHeart,
   faBookmark,
   faUser,
-  faClock,
   faEye
 } from '@fortawesome/free-solid-svg-icons';
 import AIHeader from '../../components/AIHeader';

@@ -5,7 +5,6 @@ import { motion } from 'framer-motion';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { 
   faRocket, 
-  faBuilding,
   faChartLine,
   faUsers,
   faCog,
