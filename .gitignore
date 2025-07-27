@@ -2,9 +2,14 @@ node_modules/
 .next/
 .env*
 backend_venv/
+venv/
+backend/venv/
 __pycache__/
 *.pyc
 *.pyo
 *.pyd
 .DS_Store
-*.log 
+*.log
+*.pid
+media/
+staticfiles/ 

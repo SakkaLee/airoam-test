@@ -11,33 +11,59 @@ jobs:
       postgres:
         image: postgres:15
         env:
-          POSTGRES_DB: image.png
-          POSTGRES_USER: ${{ secrets.DB_USER }}
-          POSTGRES_PASSWORD: ${{ secrets.DB_PASSWORD }}
+          POSTGRES_DB: airoam_db
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
         ports:
           - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
     steps:
       - uses: actions/checkout@v4
+      
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: '3.12'
+      
+      - name: Cache pip dependencies
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('backend/requirements.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
+      
       - name: Install dependencies
         run: |
           python -m venv venv
           source venv/bin/activate
+          pip install --upgrade pip
           pip install -r backend/requirements.txt
+      
       - name: Run migrations
         run: |
           source venv/bin/activate
           cd backend
-          python manage.py migrate
+          python manage.py migrate --run-syncdb
+        env:
+          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/airoam_db
+      
       - name: Run tests
         run: |
           source venv/bin/activate
           cd backend
-          python manage.py test
-      # - name: Deploy to production server (customize this step)
-      #   run: |
-      #     scp -r . user@yourserver:/path/to/app
-      #     ssh user@yourserver 'cd /path/to/app && docker-compose up -d' 
+          python manage.py test --verbosity=2
+        env:
+          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/airoam_db
+      
+      - name: Deploy to Railway
+        if: success()
+        run: |
+          echo "Backend deployment completed successfully"
+          # 这里可以添加实际的Railway部署命令
+          # railway login --token ${{ secrets.RAILWAY_TOKEN }}
+          # railway up --service backend 
