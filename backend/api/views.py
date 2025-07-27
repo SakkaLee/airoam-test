@@ -14,6 +14,17 @@ import stripe
 from django.conf import settings
 import re
 from bs4 import BeautifulSoup
+from django.http import JsonResponse
+from rest_framework.decorators import api_view
+
+@api_view(['GET'])
+def health_check(request):
+    """健康检查端点"""
+    return JsonResponse({
+        'status': 'healthy',
+        'message': 'AI Tech Platform API is running',
+        'version': '1.0.0'
+    })
 
 class NewsListView(APIView):
     permission_classes = [AllowAny]
