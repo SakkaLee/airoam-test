@@ -1,4 +1,4 @@
-name: Deploy Frontend
+name: Frontend Build Test
 
 on:
   push:
@@ -6,14 +6,15 @@ on:
     paths:
       - 'frontend/**'
       - '.github/workflows/deploy-frontend.yml'
+      - 'vercel.json'
 
 jobs:
-  build:
+  build-test:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       
-      - name: Install Node.js
+      - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '20.x'
@@ -25,12 +26,12 @@ jobs:
           cd frontend
           npm ci --legacy-peer-deps
       
-      - name: Build
+      - name: Build test
         run: |
           cd frontend
           npm run build
       
-      - name: Build Status
+      - name: Build success
         run: |
-          echo "✅ Frontend build completed successfully"
-          echo "🚀 Vercel will automatically deploy from GitHub" 
+          echo "✅ Frontend build test passed"
+          echo "🚀 Vercel will auto-deploy from GitHub" 
