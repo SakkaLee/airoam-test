@@ -6,7 +6,6 @@ const nextConfig: NextConfig = {
     unoptimized: true
   },
   trailingSlash: false,
-  output: 'standalone',
   async headers() {
     return [
       {
