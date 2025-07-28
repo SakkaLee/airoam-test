@@ -71,8 +71,9 @@ export default function RegisterPage() {
     setLoading(true);
     
     try {
-      // TODO: 调用后端API进行注册
-      const response = await fetch('/api/register', {
+      // 调用后端API进行注册
+      const API_BASE = process.env.NEXT_PUBLIC_API_BASE || 'https://api.airoam.net';
+      const response = await fetch(`${API_BASE}/api/register/`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

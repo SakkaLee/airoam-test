@@ -28,7 +28,8 @@ const UploadDemoPage: React.FC = () => {
   const fetchPublicFiles = async () => {
     try {
       setLoading(true);
-      const response = await fetch('http://localhost:8000/api/public-files/');
+              const API_BASE = process.env.NEXT_PUBLIC_API_BASE || 'https://api.airoam.net';
+        const response = await fetch(`${API_BASE}/api/public-files/`);
       if (response.ok) {
         const data = await response.json();
         setPublicFiles(data.files);

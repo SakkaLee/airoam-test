@@ -41,7 +41,8 @@ const FilesPage: React.FC = () => {
   const fetchFiles = async () => {
     try {
       setLoading(true);
-      const response = await fetch('http://localhost:8000/api/files/', {
+      const API_BASE = process.env.NEXT_PUBLIC_API_BASE || 'https://api.airoam.net';
+      const response = await fetch(`${API_BASE}/api/files/`, {
         credentials: 'include',
       });
       
@@ -61,7 +62,8 @@ const FilesPage: React.FC = () => {
   const fetchPublicFiles = async () => {
     try {
       setLoading(true);
-      const response = await fetch('http://localhost:8000/api/public-files/');
+      const API_BASE = process.env.NEXT_PUBLIC_API_BASE || 'https://api.airoam.net';
+      const response = await fetch(`${API_BASE}/api/public-files/`);
       
       if (response.ok) {
         const data = await response.json();
@@ -97,7 +99,8 @@ const FilesPage: React.FC = () => {
     if (!confirm('确定要删除这个文件吗？')) return;
 
     try {
-      const response = await fetch(`http://localhost:8000/api/files/${fileId}/`, {
+      const API_BASE = process.env.NEXT_PUBLIC_API_BASE || 'https://api.airoam.net';
+      const response = await fetch(`${API_BASE}/api/files/${fileId}/`, {
         method: 'DELETE',
         credentials: 'include',
       });
@@ -118,7 +121,8 @@ const FilesPage: React.FC = () => {
 
   const handleShare = async (fileId: number) => {
     try {
-      const response = await fetch(`http://localhost:8000/api/files/${fileId}/share/`, {
+      const API_BASE = process.env.NEXT_PUBLIC_API_BASE || 'https://api.airoam.net';
+      const response = await fetch(`${API_BASE}/api/files/${fileId}/share/`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

@@ -55,8 +55,9 @@ export default function LoginPage() {
     setLoading(true);
     
     try {
-      // TODO: 调用后端API进行登录
-      const response = await fetch('/api/login', {
+      // 调用后端API进行登录
+      const API_BASE = process.env.NEXT_PUBLIC_API_BASE || 'https://api.airoam.net';
+      const response = await fetch(`${API_BASE}/api/login/`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
