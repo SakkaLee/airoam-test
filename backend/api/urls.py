@@ -3,6 +3,7 @@ from . import views
 from . import upload_views
 from . import ai_tools
 from . import community
+from . import enterprise
 
 urlpatterns = [
     path('health/', views.health_check, name='health_check'),
@@ -24,4 +25,9 @@ urlpatterns = [
     path('community/recommendations/', community.ContentRecommendationView.as_view(), name='recommendations'),
     path('community/discussions/', community.CommunityDiscussionView.as_view(), name='discussions'),
     path('community/content-creation/', community.ContentCreationView.as_view(), name='content-creation'),
+    # 企业解决方案 API
+    path('enterprise/consultation/', enterprise.AIConsultationView.as_view(), name='ai-consultation'),
+    path('enterprise/development/', enterprise.CustomDevelopmentView.as_view(), name='custom-development'),
+    path('enterprise/training/', enterprise.TrainingProgramView.as_view(), name='training-program'),
+    path('enterprise/quote/', enterprise.SolutionQuoteView.as_view(), name='solution-quote'),
 ] 
