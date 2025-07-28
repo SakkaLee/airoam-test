@@ -96,7 +96,7 @@ class NewsListView(APIView):
                         "source": "arXiv",
                         "time": self.format_time(published),
                         "url": paper_id,
-                        "image": "/api/placeholder/400/200",
+                        "image": "/globe.svg",
                         "timestamp": self.parse_timestamp(published)
                     })
             
@@ -157,7 +157,7 @@ class NewsListView(APIView):
                 "source": "OpenAI Blog",
                 "time": "1 hour ago",
                 "url": "https://openai.com/blog/gpt-4o",
-                "image": "/api/placeholder/400/200",
+                "image": "/globe.svg",
                 "timestamp": timezone.now().timestamp() - 3600
             },
             {
@@ -168,7 +168,7 @@ class NewsListView(APIView):
                 "source": "Nature",
                 "time": "3 hours ago",
                 "url": "https://www.nature.com/articles/s41586-024-07487-w",
-                "image": "/api/placeholder/400/200",
+                "image": "/globe.svg",
                 "timestamp": timezone.now().timestamp() - 10800
             },
             {
@@ -179,7 +179,7 @@ class NewsListView(APIView):
                 "source": "Microsoft Blog",
                 "time": "5 hours ago",
                 "url": "https://blogs.microsoft.com/ai-coding-assistant",
-                "image": "/api/placeholder/400/200",
+                "image": "/globe.svg",
                 "timestamp": timezone.now().timestamp() - 18000
             }
         ]
@@ -214,7 +214,7 @@ class NewsListView(APIView):
                             "source": "OpenAI Blog",
                             "time": "Recently",
                             "url": url,
-                            "image": "/api/placeholder/400/200",
+                            "image": "/globe.svg",
                             "timestamp": timezone.now().timestamp()
                         })
                 
@@ -250,7 +250,7 @@ class NewsListView(APIView):
                             "source": "Google AI Blog",
                             "time": "Recently",
                             "url": url,
-                            "image": "/api/placeholder/400/200",
+                            "image": "/globe.svg",
                             "timestamp": timezone.now().timestamp()
                         })
                 
@@ -294,7 +294,7 @@ class NewsListView(APIView):
                 "source": "Science",
                 "time": "1 day ago",
                 "url": "https://science.org/quantum-ml-breakthrough",
-                "image": "/api/placeholder/400/200",
+                "image": "/globe.svg",
                 "timestamp": timezone.now().timestamp() - 86400
             }
         ]
@@ -310,7 +310,7 @@ class NewsListView(APIView):
                 "source": "AI Research",
                 "time": "2 hours ago",
                 "url": "#",
-                "image": "/api/placeholder/400/200",
+                "image": "/globe.svg",
                 "timestamp": timezone.now().timestamp() - 7200
             }
         ]
