@@ -2,6 +2,7 @@ from django.urls import path
 from . import views
 from . import upload_views
 from . import ai_tools
+from . import community
 
 urlpatterns = [
     path('health/', views.health_check, name='health_check'),
@@ -18,4 +19,9 @@ urlpatterns = [
     path('ai/code-assistant/', ai_tools.CodeAssistantView.as_view(), name='code-assistant'),
     path('ai/speech-to-text/', ai_tools.SpeechToTextView.as_view(), name='speech-to-text'),
     path('ai/translation/', ai_tools.TranslationView.as_view(), name='translation'),
+    # 社区功能 API
+    path('community/ai-assistant/', community.AIAssistantView.as_view(), name='ai-assistant'),
+    path('community/recommendations/', community.ContentRecommendationView.as_view(), name='recommendations'),
+    path('community/discussions/', community.CommunityDiscussionView.as_view(), name='discussions'),
+    path('community/content-creation/', community.ContentCreationView.as_view(), name='content-creation'),
 ] 
