@@ -23,3 +23,10 @@
 - Contact email: Airoam@gmail.com
 - Ready for further AI news/data integration
 # Test commit
+
+## 环境变量与部署说明
+
+- 在 Vercel 或本地开发时，需设置环境变量：
+  - `NEXT_PUBLIC_API_BASE=https://9ncysfs0.up.railway.app`（或你的后端域名）
+- 参考 `.env.example` 文件。
+- 推送代码后，Vercel 会自动构建并部署。

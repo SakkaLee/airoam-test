@@ -51,3 +51,10 @@ python manage.py runserver 0.0.0.0:8000
 ## API Structure
 - `/api/news/` : Get AI news (demo)
 - Ready for further endpoints (user, comments, etc.) 
+
+## 部署与环境变量说明
+
+- Railway 部署需配置以下环境变量：
+  - `SECRET_KEY`、`ALLOWED_HOSTS`、`PGDATABASE`、`PGUSER`、`PGPASSWORD`、`PGHOST`、`PGPORT`、`STRIPE_SECRET_KEY` 等。
+- 推送代码到 GitHub 后，Railway 会自动构建并部署。
+- 生产环境建议使用 `settings_prod.py`。 
