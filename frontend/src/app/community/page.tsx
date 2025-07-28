@@ -4,300 +4,535 @@ import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { 
-  faComments,
+  faComments, 
+  faRobot, 
   faLightbulb,
-  faShare,
+  faUsers,
+  faPen,
   faHeart,
-  faBookmark,
-  faUser,
-  faEye
+  faShare,
+  faSpinner,
+  faTimes
 } from '@fortawesome/free-solid-svg-icons';
 import AIHeader from '../../components/AIHeader';
 
 const CommunityPage: React.FC = () => {
-  const [activeTab, setActiveTab] = useState('discussions');
-
-  const discussions = [
+  const [activeTab, setActiveTab] = useState('ai-assistant');
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+  
+  // AI 助手状态
+  const [question, setQuestion] = useState('');
+  const [context, setContext] = useState('');
+  const [aiAnswer, setAiAnswer] = useState('');
+  
+  // 内容推荐状态
+  const [interests, setInterests] = useState('');
+  const [recommendations, setRecommendations] = useState('');
+  
+  // 社区讨论状态
+  const [discussionTopic, setDiscussionTopic] = useState('');
+  const [discussionContent, setDiscussionContent] = useState('');
+  const [discussions, setDiscussions] = useState([
     {
-      id: 1,
-      title: '如何利用AI提升工作效率？',
-      content: '分享一些实用的AI工具和技巧，帮助大家提高工作效率...',
-      author: 'AI探索者',
-      avatar: '/api/placeholder/40/40',
-      likes: 128,
-      comments: 45,
-      views: 1200,
-      time: '2小时前',
-      tags: ['效率提升', 'AI工具', '工作技巧'],
-      hot: true
+      id: '1',
+      topic: 'AI 技术发展趋势',
+      content: '大家觉得未来 AI 技术会如何发展？有哪些值得关注的方向？',
+      user: 'AI爱好者',
+      likes: 15,
+      replies: 8,
+      time: '2小时前'
     },
     {
-      id: 2,
-      title: 'ChatGPT vs Claude：哪个更适合编程？',
-      content: '对比两个主流AI助手的编程能力，分享使用体验...',
-      author: '代码大师',
-      avatar: '/api/placeholder/40/40',
-      likes: 89,
-      comments: 32,
-      views: 890,
-      time: '5小时前',
-      tags: ['编程', 'AI助手', '对比评测'],
-      hot: true
-    },
-    {
-      id: 3,
-      title: 'AI绘画入门指南',
-      content: '从零开始学习AI绘画，推荐适合新手的工具和教程...',
-      author: '艺术创作者',
-      avatar: '/api/placeholder/40/40',
-      likes: 156,
-      comments: 67,
-      views: 2100,
-      time: '1天前',
-      tags: ['AI绘画', '入门教程', '工具推荐'],
-      hot: false
+      id: '2',
+      topic: '机器学习入门建议',
+      content: '想学习机器学习，有什么好的入门路径和资源推荐吗？',
+      user: '新手小白',
+      likes: 23,
+      replies: 12,
+      time: '5小时前'
     }
-  ];
+  ]);
 
-  const questions = [
-    {
-      id: 1,
-      title: '如何训练自己的AI模型？',
-      content: '想了解如何基于自己的数据训练AI模型，有什么好的教程推荐吗？',
-      author: 'AI学习者',
-      avatar: '/api/placeholder/40/40',
-      likes: 45,
-      comments: 12,
-      views: 560,
-      time: '3小时前',
-      tags: ['模型训练', '机器学习', '教程'],
-      solved: false
-    },
-    {
-      id: 2,
-      title: 'Midjourney和Stable Diffusion哪个更好？',
-      content: '在图像生成方面，这两个工具各有什么优缺点？',
-      author: '设计师小王',
-      avatar: '/api/placeholder/40/40',
-      likes: 78,
-      comments: 23,
-      views: 980,
-      time: '6小时前',
-      tags: ['图像生成', '工具对比', '设计'],
-      solved: true
+  const handleAIQuestion = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!question.trim()) {
+      setError('请输入您的问题');
+      return;
     }
-  ];
+
+    setLoading(true);
+    setError('');
+    setAiAnswer('');
+
+    try {
+      const API_BASE = process.env.NEXT_PUBLIC_API_BASE || 'https://api.airoam.net';
+      const response = await fetch(`${API_BASE}/api/community/ai-assistant/`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          question,
+          context,
+          user_id: 'anonymous'
+        }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        setAiAnswer(data.answer);
+      } else {
+        setError(data.error || 'AI 助手暂时无法回答，请稍后重试');
+      }
+    } catch (error) {
+      setError('网络错误，请检查连接');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleGetRecommendations = async () => {
+    if (!interests.trim()) {
+      setError('请输入您的兴趣');
+      return;
+    }
+
+    setLoading(true);
+    setError('');
+    setRecommendations('');
+
+    try {
+      const API_BASE = process.env.NEXT_PUBLIC_API_BASE || 'https://api.airoam.net';
+      const response = await fetch(`${API_BASE}/api/community/recommendations/`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          interests: interests.split(',').map(i => i.trim()),
+          history: [],
+          category: 'all'
+        }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        setRecommendations(data.recommendations);
+      } else {
+        setError(data.error || '推荐失败，请稍后重试');
+      }
+    } catch (error) {
+      setError('网络错误，请检查连接');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleCreateDiscussion = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!discussionTopic.trim() || !discussionContent.trim()) {
+      setError('请输入话题和内容');
+      return;
+    }
+
+    setLoading(true);
+    setError('');
+
+    try {
+      const API_BASE = process.env.NEXT_PUBLIC_API_BASE || 'https://api.airoam.net';
+      const response = await fetch(`${API_BASE}/api/community/discussions/`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          topic: discussionTopic,
+          content: discussionContent,
+          user_id: 'anonymous'
+        }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        // 添加到本地讨论列表
+        const newDiscussion = {
+          id: data.discussion.id,
+          topic: discussionTopic,
+          content: discussionContent,
+          user: '我',
+          likes: 0,
+          replies: 0,
+          time: '刚刚'
+        };
+        setDiscussions([newDiscussion, ...discussions]);
+        setDiscussionTopic('');
+        setDiscussionContent('');
+      } else {
+        setError(data.error || '发布失败，请稍后重试');
+      }
+    } catch (error) {
+      setError('网络错误，请检查连接');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const tabs = [
-    { id: 'discussions', name: '讨论区', icon: faComments },
-    { id: 'questions', name: '问答区', icon: faLightbulb },
-    { id: 'resources', name: '资源分享', icon: faShare }
+    { id: 'ai-assistant', name: 'AI 助手', icon: faRobot },
+    { id: 'recommendations', name: '内容推荐', icon: faLightbulb },
+    { id: 'discussions', name: '社区讨论', icon: faComments },
+    { id: 'create', name: '发布讨论', icon: faPen }
   ];
 
   return (
     <div className="min-h-screen bg-black text-white">
       <AIHeader />
       
-      {/* Hero Section */}
-      <section className="pt-20 pb-12 bg-gradient-to-br from-gray-900 to-black">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-20 pb-12">
+        {/* 页面标题 */}
+        <motion.div
+          initial={{ opacity: 0, y: 50 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8 }}
+          className="text-center mb-12"
+        >
+          <h1 className="text-4xl md:text-6xl font-bold mb-6">
+            <span className="bg-gradient-to-r from-cyan-400 via-green-400 to-blue-400 bg-clip-text text-transparent">
+              智能社区
+            </span>
+          </h1>
+          <p className="text-xl text-gray-300 max-w-3xl mx-auto">
+            NLP精准推荐，AI问答机器人，内容创作助手，让AI技术触手可及
+          </p>
+        </motion.div>
+
+        {/* 标签页导航 */}
+        <div className="flex flex-wrap justify-center gap-4 mb-8">
+          {tabs.map((tab) => (
+            <motion.button
+              key={tab.id}
+              onClick={() => setActiveTab(tab.id)}
+              className={`flex items-center px-6 py-3 rounded-lg font-semibold transition-all duration-200 ${
+                activeTab === tab.id 
+                  ? 'bg-gradient-to-r from-cyan-400 to-green-400 text-black' 
+                  : 'bg-gray-800/50 text-gray-300 hover:bg-gray-700/50 hover:text-white'
+              }`}
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+            >
+              <FontAwesomeIcon icon={tab.icon} className="mr-2" />
+              {tab.name}
+            </motion.button>
+          ))}
+        </div>
+
+        {/* 错误提示 */}
+        {error && (
           <motion.div
-            initial={{ opacity: 0, y: 50 }}
+            initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-            className="text-center"
+            className="mb-6 p-4 bg-red-500/20 border border-red-500/30 rounded-lg"
           >
-            <h1 className="text-4xl md:text-6xl font-bold mb-6">
-              <span className="bg-gradient-to-r from-purple-400 via-pink-400 to-red-400 bg-clip-text text-transparent">
-                智能社区
-              </span>
-            </h1>
-            <p className="text-xl text-gray-300 mb-8 max-w-3xl mx-auto">
-              NLP精准推荐，AI问答机器人，内容创作助手，连接全球AI爱好者
-            </p>
-            
-            {/* Stats */}
-            <div className="grid grid-cols-3 gap-8 max-w-2xl mx-auto mb-8">
-              <div className="text-center">
-                <div className="text-3xl font-bold text-purple-400">50K+</div>
-                <div className="text-gray-400">活跃用户</div>
-              </div>
-              <div className="text-center">
-                <div className="text-3xl font-bold text-pink-400">100K+</div>
-                <div className="text-gray-400">讨论话题</div>
-              </div>
-              <div className="text-center">
-                <div className="text-3xl font-bold text-red-400">1M+</div>
-                <div className="text-gray-400">互动次数</div>
-              </div>
+            <div className="flex items-center">
+              <FontAwesomeIcon icon={faTimes} className="text-red-400 mr-2" />
+              <span className="text-red-400">{error}</span>
             </div>
           </motion.div>
-        </div>
-      </section>
+        )}
 
-      {/* Tabs */}
-      <section className="py-8 bg-gray-900/50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-center space-x-4">
-            {tabs.map((tab) => (
-              <motion.button
-                key={tab.id}
-                onClick={() => setActiveTab(tab.id)}
-                className={`flex items-center space-x-2 px-6 py-3 rounded-lg font-semibold transition-all duration-200 ${
-                  activeTab === tab.id
-                    ? 'bg-gradient-to-r from-purple-400 to-pink-400 text-black'
-                    : 'bg-gray-800/50 text-gray-300 hover:bg-gray-700/50 hover:text-white'
-                }`}
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-              >
-                <FontAwesomeIcon icon={tab.icon} className="text-sm" />
-                <span>{tab.name}</span>
-              </motion.button>
-            ))}
-          </div>
-        </div>
-      </section>
+        {/* AI 助手 */}
+        {activeTab === 'ai-assistant' && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="grid grid-cols-1 lg:grid-cols-2 gap-8"
+          >
+            <div className="bg-gray-800/50 backdrop-blur-sm border border-gray-700 rounded-2xl p-8">
+              <h2 className="text-2xl font-bold mb-6 flex items-center">
+                <FontAwesomeIcon icon={faRobot} className="mr-3 text-cyan-400" />
+                AI 智能助手
+              </h2>
+              
+              <form onSubmit={handleAIQuestion} className="space-y-6">
+                <div>
+                  <label className="block text-sm font-medium text-gray-300 mb-2">
+                    您的问题 *
+                  </label>
+                  <textarea
+                    value={question}
+                    onChange={(e) => setQuestion(e.target.value)}
+                    rows={4}
+                    className="w-full px-4 py-3 bg-gray-700/50 text-white border border-gray-600 rounded-lg focus:outline-none focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/20 resize-none"
+                    placeholder="请详细描述您的问题..."
+                    required
+                  />
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium text-gray-300 mb-2">
+                    背景信息（可选）
+                  </label>
+                  <textarea
+                    value={context}
+                    onChange={(e) => setContext(e.target.value)}
+                    rows={3}
+                    className="w-full px-4 py-3 bg-gray-700/50 text-white border border-gray-600 rounded-lg focus:outline-none focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/20 resize-none"
+                    placeholder="提供更多背景信息，帮助AI更好地理解您的问题..."
+                  />
+                </div>
+                
+                <motion.button
+                  type="submit"
+                  disabled={loading}
+                  className="w-full px-6 py-4 bg-gradient-to-r from-cyan-400 to-green-400 text-black font-semibold rounded-lg hover:from-cyan-500 hover:to-green-500 transition-all duration-200 shadow-lg hover:shadow-xl disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center"
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                >
+                  {loading ? (
+                    <>
+                      <FontAwesomeIcon icon={faSpinner} className="animate-spin mr-2" />
+                      思考中...
+                    </>
+                  ) : (
+                    <>
+                      <FontAwesomeIcon icon={faRobot} className="mr-2" />
+                      询问AI助手
+                    </>
+                  )}
+                </motion.button>
+              </form>
+            </div>
 
-      {/* Content */}
-      <section className="py-12">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          {activeTab === 'discussions' && (
-            <div className="space-y-6">
-              {discussions.map((discussion, index) => (
+            <div className="bg-gray-800/50 backdrop-blur-sm border border-gray-700 rounded-2xl p-8">
+              <h2 className="text-2xl font-bold mb-6">AI 回答</h2>
+              
+              {loading && (
+                <div className="flex items-center justify-center py-12">
+                  <FontAwesomeIcon icon={faSpinner} className="animate-spin text-4xl text-cyan-400" />
+                </div>
+              )}
+
+              {aiAnswer && (
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="bg-gray-700/30 border border-gray-600 rounded-lg p-4"
+                >
+                  <div className="text-gray-300 leading-relaxed whitespace-pre-wrap">
+                    {aiAnswer}
+                  </div>
+                </motion.div>
+              )}
+
+              {!loading && !aiAnswer && (
+                <div className="text-center py-12 text-gray-400">
+                  <FontAwesomeIcon icon={faRobot} className="text-4xl mb-4" />
+                  <p>在左侧输入您的问题，AI助手将为您提供专业解答</p>
+                </div>
+              )}
+            </div>
+          </motion.div>
+        )}
+
+        {/* 内容推荐 */}
+        {activeTab === 'recommendations' && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="grid grid-cols-1 lg:grid-cols-2 gap-8"
+          >
+            <div className="bg-gray-800/50 backdrop-blur-sm border border-gray-700 rounded-2xl p-8">
+              <h2 className="text-2xl font-bold mb-6 flex items-center">
+                <FontAwesomeIcon icon={faLightbulb} className="mr-3 text-cyan-400" />
+                智能内容推荐
+              </h2>
+              
+              <div className="space-y-6">
+                <div>
+                  <label className="block text-sm font-medium text-gray-300 mb-2">
+                    您的兴趣
+                  </label>
+                  <textarea
+                    value={interests}
+                    onChange={(e) => setInterests(e.target.value)}
+                    rows={4}
+                    className="w-full px-4 py-3 bg-gray-700/50 text-white border border-gray-600 rounded-lg focus:outline-none focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/20 resize-none"
+                    placeholder="请输入您的兴趣，用逗号分隔，例如：AI技术,机器学习,编程,设计..."
+                  />
+                </div>
+                
+                <motion.button
+                  onClick={handleGetRecommendations}
+                  disabled={loading}
+                  className="w-full px-6 py-4 bg-gradient-to-r from-cyan-400 to-green-400 text-black font-semibold rounded-lg hover:from-cyan-500 hover:to-green-500 transition-all duration-200 shadow-lg hover:shadow-xl disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center"
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                >
+                  {loading ? (
+                    <>
+                      <FontAwesomeIcon icon={faSpinner} className="animate-spin mr-2" />
+                      分析中...
+                    </>
+                  ) : (
+                    <>
+                      <FontAwesomeIcon icon={faLightbulb} className="mr-2" />
+                      获取推荐
+                    </>
+                  )}
+                </motion.button>
+              </div>
+            </div>
+
+            <div className="bg-gray-800/50 backdrop-blur-sm border border-gray-700 rounded-2xl p-8">
+              <h2 className="text-2xl font-bold mb-6">推荐内容</h2>
+              
+              {loading && (
+                <div className="flex items-center justify-center py-12">
+                  <FontAwesomeIcon icon={faSpinner} className="animate-spin text-4xl text-cyan-400" />
+                </div>
+              )}
+
+              {recommendations && (
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="bg-gray-700/30 border border-gray-600 rounded-lg p-4"
+                >
+                  <div className="text-gray-300 leading-relaxed whitespace-pre-wrap">
+                    {recommendations}
+                  </div>
+                </motion.div>
+              )}
+
+              {!loading && !recommendations && (
+                <div className="text-center py-12 text-gray-400">
+                  <FontAwesomeIcon icon={faLightbulb} className="text-4xl mb-4" />
+                  <p>在左侧输入您的兴趣，AI将为您推荐相关内容</p>
+                </div>
+              )}
+            </div>
+          </motion.div>
+        )}
+
+        {/* 社区讨论 */}
+        {activeTab === 'discussions' && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="space-y-6"
+          >
+            <h2 className="text-2xl font-bold mb-6 flex items-center">
+              <FontAwesomeIcon icon={faComments} className="mr-3 text-cyan-400" />
+              社区讨论
+            </h2>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {discussions.map((discussion) => (
                 <motion.div
                   key={discussion.id}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.5, delay: index * 0.1 }}
-                  className="bg-gray-800/50 backdrop-blur-sm border border-gray-700 rounded-2xl p-6 hover:border-purple-400/50 transition-all duration-300"
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  className="bg-gray-800/50 backdrop-blur-sm border border-gray-700 rounded-xl p-6 hover:border-cyan-400/50 transition-all duration-300"
                 >
-                  <div className="flex items-start space-x-4">
-                    <div className="w-10 h-10 bg-gradient-to-r from-purple-400 to-pink-400 rounded-full flex items-center justify-center">
-                      <FontAwesomeIcon icon={faUser} className="text-white text-sm" />
+                  <h3 className="text-lg font-bold mb-2 text-white">{discussion.topic}</h3>
+                  <p className="text-gray-400 text-sm mb-4 line-clamp-3">{discussion.content}</p>
+                  
+                  <div className="flex items-center justify-between text-sm text-gray-500">
+                    <span>{discussion.user}</span>
+                    <span>{discussion.time}</span>
+                  </div>
+                  
+                  <div className="flex items-center justify-between mt-4 pt-4 border-t border-gray-600">
+                    <div className="flex items-center space-x-4">
+                      <button className="flex items-center space-x-1 text-gray-400 hover:text-red-400 transition-colors">
+                        <FontAwesomeIcon icon={faHeart} className="text-sm" />
+                        <span className="text-sm">{discussion.likes}</span>
+                      </button>
+                      <button className="flex items-center space-x-1 text-gray-400 hover:text-blue-400 transition-colors">
+                        <FontAwesomeIcon icon={faComments} className="text-sm" />
+                        <span className="text-sm">{discussion.replies}</span>
+                      </button>
                     </div>
-                    <div className="flex-1">
-                      <div className="flex items-center space-x-2 mb-2">
-                        <h3 className="text-lg font-bold text-white">{discussion.title}</h3>
-                        {discussion.hot && (
-                          <span className="px-2 py-1 bg-red-500 text-white text-xs rounded-full">热门</span>
-                        )}
-                      </div>
-                      <p className="text-gray-400 mb-4">{discussion.content}</p>
-                      
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center space-x-4 text-sm text-gray-400">
-                          <span>{discussion.author}</span>
-                          <span>•</span>
-                          <span>{discussion.time}</span>
-                          <span>•</span>
-                          <div className="flex items-center space-x-1">
-                            <FontAwesomeIcon icon={faEye} className="text-xs" />
-                            <span>{discussion.views}</span>
-                          </div>
-                        </div>
-                        
-                        <div className="flex items-center space-x-4">
-                          <button className="flex items-center space-x-1 text-gray-400 hover:text-red-400 transition-colors duration-200">
-                            <FontAwesomeIcon icon={faHeart} className="text-sm" />
-                            <span className="text-sm">{discussion.likes}</span>
-                          </button>
-                          <button className="flex items-center space-x-1 text-gray-400 hover:text-blue-400 transition-colors duration-200">
-                            <FontAwesomeIcon icon={faComments} className="text-sm" />
-                            <span className="text-sm">{discussion.comments}</span>
-                          </button>
-                          <button className="flex items-center space-x-1 text-gray-400 hover:text-yellow-400 transition-colors duration-200">
-                            <FontAwesomeIcon icon={faBookmark} className="text-sm" />
-                          </button>
-                        </div>
-                      </div>
-                      
-                      <div className="flex flex-wrap gap-2 mt-4">
-                        {discussion.tags.map((tag) => (
-                          <span key={tag} className="px-3 py-1 bg-gray-700 text-gray-300 text-xs rounded-full">
-                            {tag}
-                          </span>
-                        ))}
-                      </div>
-                    </div>
+                    <button className="text-gray-400 hover:text-green-400 transition-colors">
+                      <FontAwesomeIcon icon={faShare} className="text-sm" />
+                    </button>
                   </div>
                 </motion.div>
               ))}
             </div>
-          )}
+          </motion.div>
+        )}
 
-          {activeTab === 'questions' && (
-            <div className="space-y-6">
-              {questions.map((question, index) => (
-                <motion.div
-                  key={question.id}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.5, delay: index * 0.1 }}
-                  className="bg-gray-800/50 backdrop-blur-sm border border-gray-700 rounded-2xl p-6 hover:border-pink-400/50 transition-all duration-300"
-                >
-                  <div className="flex items-start space-x-4">
-                    <div className="w-10 h-10 bg-gradient-to-r from-pink-400 to-red-400 rounded-full flex items-center justify-center">
-                      <FontAwesomeIcon icon={faLightbulb} className="text-white text-sm" />
-                    </div>
-                    <div className="flex-1">
-                      <div className="flex items-center space-x-2 mb-2">
-                        <h3 className="text-lg font-bold text-white">{question.title}</h3>
-                        {question.solved ? (
-                          <span className="px-2 py-1 bg-green-500 text-white text-xs rounded-full">已解决</span>
-                        ) : (
-                          <span className="px-2 py-1 bg-yellow-500 text-white text-xs rounded-full">待解决</span>
-                        )}
-                      </div>
-                      <p className="text-gray-400 mb-4">{question.content}</p>
-                      
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center space-x-4 text-sm text-gray-400">
-                          <span>{question.author}</span>
-                          <span>•</span>
-                          <span>{question.time}</span>
-                          <span>•</span>
-                          <div className="flex items-center space-x-1">
-                            <FontAwesomeIcon icon={faEye} className="text-xs" />
-                            <span>{question.views}</span>
-                          </div>
-                        </div>
-                        
-                        <div className="flex items-center space-x-4">
-                          <button className="flex items-center space-x-1 text-gray-400 hover:text-red-400 transition-colors duration-200">
-                            <FontAwesomeIcon icon={faHeart} className="text-sm" />
-                            <span className="text-sm">{question.likes}</span>
-                          </button>
-                          <button className="flex items-center space-x-1 text-gray-400 hover:text-blue-400 transition-colors duration-200">
-                            <FontAwesomeIcon icon={faComments} className="text-sm" />
-                            <span className="text-sm">{question.comments}</span>
-                          </button>
-                        </div>
-                      </div>
-                      
-                      <div className="flex flex-wrap gap-2 mt-4">
-                        {question.tags.map((tag) => (
-                          <span key={tag} className="px-3 py-1 bg-gray-700 text-gray-300 text-xs rounded-full">
-                            {tag}
-                          </span>
-                        ))}
-                      </div>
-                    </div>
-                  </div>
-                </motion.div>
-              ))}
-            </div>
-          )}
-
-          {activeTab === 'resources' && (
-            <div className="text-center py-12">
-              <FontAwesomeIcon icon={faShare} className="text-6xl text-gray-600 mb-4" />
-              <h3 className="text-2xl font-bold text-gray-300 mb-2">资源分享区</h3>
-              <p className="text-gray-400">这里将展示用户分享的AI相关资源、教程和工具</p>
-            </div>
-          )}
-        </div>
-      </section>
+        {/* 发布讨论 */}
+        {activeTab === 'create' && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="max-w-2xl mx-auto"
+          >
+            <h2 className="text-2xl font-bold mb-6 flex items-center">
+              <FontAwesomeIcon icon={faPen} className="mr-3 text-cyan-400" />
+              发布新讨论
+            </h2>
+            
+            <form onSubmit={handleCreateDiscussion} className="space-y-6">
+              <div>
+                <label className="block text-sm font-medium text-gray-300 mb-2">
+                  讨论话题 *
+                </label>
+                <input
+                  type="text"
+                  value={discussionTopic}
+                  onChange={(e) => setDiscussionTopic(e.target.value)}
+                  className="w-full px-4 py-3 bg-gray-700/50 text-white border border-gray-600 rounded-lg focus:outline-none focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/20"
+                  placeholder="请输入讨论话题..."
+                  required
+                />
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium text-gray-300 mb-2">
+                  讨论内容 *
+                </label>
+                <textarea
+                  value={discussionContent}
+                  onChange={(e) => setDiscussionContent(e.target.value)}
+                  rows={6}
+                  className="w-full px-4 py-3 bg-gray-700/50 text-white border border-gray-600 rounded-lg focus:outline-none focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/20 resize-none"
+                  placeholder="请详细描述您的观点或问题..."
+                  required
+                />
+              </div>
+              
+              <motion.button
+                type="submit"
+                disabled={loading}
+                className="w-full px-6 py-4 bg-gradient-to-r from-cyan-400 to-green-400 text-black font-semibold rounded-lg hover:from-cyan-500 hover:to-green-500 transition-all duration-200 shadow-lg hover:shadow-xl disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center"
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+              >
+                {loading ? (
+                  <>
+                    <FontAwesomeIcon icon={faSpinner} className="animate-spin mr-2" />
+                    发布中...
+                  </>
+                ) : (
+                  <>
+                    <FontAwesomeIcon icon={faPen} className="mr-2" />
+                    发布讨论
+                  </>
+                )}
+              </motion.button>
+            </form>
+          </motion.div>
+        )}
+      </div>
     </div>
   );
 };
