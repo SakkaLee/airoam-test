@@ -1,301 +1,839 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { 
-  faRocket, 
-  faChartLine,
-  faUsers,
-  faCog,
+  faBuilding, 
+  faCode, 
+  faGraduationCap,
+  faCalculator,
+  faSpinner,
+  faTimes,
   faCheck,
-  faArrowRight,
-  faLightbulb,
-  faShieldAlt,
-  faGlobe
+  faArrowRight
 } from '@fortawesome/free-solid-svg-icons';
 import AIHeader from '../../components/AIHeader';
 
 const EnterprisePage: React.FC = () => {
-  const solutions = [
-    {
-      id: 1,
-      title: '智能客服系统',
-      description: '基于NLP的智能客服机器人，7x24小时在线服务',
-      features: ['多语言支持', '情感分析', '知识图谱', '无缝转人工'],
-      price: '¥50,000/月起',
-      icon: faUsers,
-      color: 'from-blue-500 to-cyan-500'
-    },
-    {
-      id: 2,
-      title: '数据分析平台',
-      description: '企业级数据分析和可视化平台，深度挖掘业务价值',
-      features: ['实时数据处理', '智能报表生成', '预测分析', '多源数据整合'],
-      price: '¥80,000/月起',
-      icon: faChartLine,
-      color: 'from-green-500 to-emerald-500'
-    },
-    {
-      id: 3,
-      title: '内容创作助手',
-      description: 'AI驱动的企业内容创作平台，提升营销效率',
-      features: ['文案生成', '图像设计', '视频制作', '多平台发布'],
-      price: '¥30,000/月起',
-      icon: faLightbulb,
-      color: 'from-purple-500 to-pink-500'
-    },
-    {
-      id: 4,
-      title: '流程自动化',
-      description: '智能工作流自动化，提升企业运营效率',
-      features: ['流程设计', '智能审批', '异常检测', '性能监控'],
-      price: '¥60,000/月起',
-      icon: faCog,
-      color: 'from-orange-500 to-red-500'
+  const [activeTab, setActiveTab] = useState('consultation');
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+  const [result, setResult] = useState('');
+  
+  // AI 咨询状态
+  const [consultationData, setConsultationData] = useState({
+    company_name: '',
+    industry: '',
+    business_goals: '',
+    current_tech: '',
+    budget_range: '',
+    timeline: ''
+  });
+  
+  // 定制开发状态
+  const [developmentData, setDevelopmentData] = useState({
+    project_name: '',
+    project_type: 'web',
+    requirements: '',
+    features: '',
+    timeline: '',
+    budget: ''
+  });
+  
+  // 技术培训状态
+  const [trainingData, setTrainingData] = useState({
+    company_name: '',
+    team_size: '',
+    skill_level: 'beginner',
+    focus_areas: '',
+    training_format: 'online',
+    duration: ''
+  });
+  
+  // 报价状态
+  const [quoteData, setQuoteData] = useState({
+    solution_type: 'consultation',
+    company_size: '',
+    project_scope: '',
+    timeline: '',
+    requirements: ''
+  });
+
+  const handleInputChange = (formData: any, setFormData: any, field: string, value: string) => {
+    setFormData({
+      ...formData,
+      [field]: value
+    });
+  };
+
+  const handleConsultation = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!consultationData.company_name || !consultationData.business_goals) {
+      setError('请填写公司名称和业务目标');
+      return;
     }
+
+    setLoading(true);
+    setError('');
+    setResult('');
+
+    try {
+      const API_BASE = process.env.NEXT_PUBLIC_API_BASE || 'https://api.airoam.net';
+      const response = await fetch(`${API_BASE}/api/enterprise/consultation/`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(consultationData),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        setResult(data.consultation);
+      } else {
+        setError(data.error || '咨询失败，请稍后重试');
+      }
+    } catch (error) {
+      setError('网络错误，请检查连接');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleDevelopment = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!developmentData.project_name || !developmentData.requirements) {
+      setError('请填写项目名称和需求描述');
+      return;
+    }
+
+    setLoading(true);
+    setError('');
+    setResult('');
+
+    try {
+      const API_BASE = process.env.NEXT_PUBLIC_API_BASE || 'https://api.airoam.net';
+      const response = await fetch(`${API_BASE}/api/enterprise/development/`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          ...developmentData,
+          features: developmentData.features.split(',').map(f => f.trim()).filter(f => f)
+        }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        setResult(data.development_plan);
+      } else {
+        setError(data.error || '方案生成失败，请稍后重试');
+      }
+    } catch (error) {
+      setError('网络错误，请检查连接');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleTraining = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!trainingData.company_name || !trainingData.focus_areas) {
+      setError('请填写公司名称和培训重点');
+      return;
+    }
+
+    setLoading(true);
+    setError('');
+    setResult('');
+
+    try {
+      const API_BASE = process.env.NEXT_PUBLIC_API_BASE || 'https://api.airoam.net';
+      const response = await fetch(`${API_BASE}/api/enterprise/training/`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          ...trainingData,
+          focus_areas: trainingData.focus_areas.split(',').map(f => f.trim()).filter(f => f)
+        }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        setResult(data.training_plan);
+      } else {
+        setError(data.error || '培训方案生成失败，请稍后重试');
+      }
+    } catch (error) {
+      setError('网络错误，请检查连接');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleQuote = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!quoteData.solution_type || !quoteData.project_scope) {
+      setError('请选择解决方案类型和项目范围');
+      return;
+    }
+
+    setLoading(true);
+    setError('');
+    setResult('');
+
+    try {
+      const API_BASE = process.env.NEXT_PUBLIC_API_BASE || 'https://api.airoam.net';
+      const response = await fetch(`${API_BASE}/api/enterprise/quote/`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(quoteData),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        setResult(data.quote);
+      } else {
+        setError(data.error || '报价生成失败，请稍后重试');
+      }
+    } catch (error) {
+      setError('网络错误，请检查连接');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const tabs = [
+    { id: 'consultation', name: 'AI 咨询', icon: faBuilding },
+    { id: 'development', name: '定制开发', icon: faCode },
+    { id: 'training', name: '技术培训', icon: faGraduationCap },
+    { id: 'quote', name: '获取报价', icon: faCalculator }
   ];
 
-  const benefits = [
-    {
-      icon: faRocket,
-      title: '快速部署',
-      description: '标准化解决方案，最快2周完成部署'
-    },
-    {
-      icon: faShieldAlt,
-      title: '安全可靠',
-      description: '企业级安全保障，数据加密传输'
-    },
-    {
-      icon: faGlobe,
-      title: '全球服务',
-      description: '7x24小时技术支持，覆盖全球客户'
-    },
-    {
-      icon: faChartLine,
-      title: '持续优化',
-      description: 'AI模型持续学习，性能不断提升'
-    }
+  const projectTypes = [
+    { value: 'web', label: 'Web 应用' },
+    { value: 'mobile', label: '移动应用' },
+    { value: 'ai', label: 'AI 系统' },
+    { value: 'data', label: '数据分析' }
+  ];
+
+  const skillLevels = [
+    { value: 'beginner', label: '初级' },
+    { value: 'intermediate', label: '中级' },
+    { value: 'advanced', label: '高级' }
+  ];
+
+  const trainingFormats = [
+    { value: 'online', label: '在线培训' },
+    { value: 'offline', label: '线下培训' },
+    { value: 'hybrid', label: '混合培训' }
+  ];
+
+  const solutionTypes = [
+    { value: 'consultation', label: 'AI 咨询' },
+    { value: 'development', label: '定制开发' },
+    { value: 'training', label: '技术培训' }
   ];
 
   return (
     <div className="min-h-screen bg-black text-white">
       <AIHeader />
       
-      {/* Hero Section */}
-      <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
-        <div className="absolute inset-0">
-          <div className="absolute inset-0 bg-gradient-to-br from-black via-gray-900 to-black"></div>
-          <div className="absolute inset-0 bg-[url('data:image/svg+xml,%3Csvg%20width%3D%2260%22%20height%3D%2260%22%20viewBox%3D%220%200%2060%2060%22%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%3E%3Cg%20fill%3D%22none%22%20fill-rule%3D%22evenodd%22%3E%3Cg%20fill%3D%22%2300ffff%22%20fill-opacity%3D%220.1%22%3E%3Ccircle%20cx%3D%2230%22%20cy%3D%2230%22%20r%3D%221%22/%3E%3C/g%3E%3C/g%3E%3C/svg%3E')] opacity-20"></div>
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-20 pb-12">
+        {/* 页面标题 */}
+        <motion.div
+          initial={{ opacity: 0, y: 50 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8 }}
+          className="text-center mb-12"
+        >
+          <h1 className="text-4xl md:text-6xl font-bold mb-6">
+            <span className="bg-gradient-to-r from-cyan-400 via-green-400 to-blue-400 bg-clip-text text-transparent">
+              企业解决方案
+            </span>
+          </h1>
+          <p className="text-xl text-gray-300 max-w-3xl mx-auto">
+            专业的企业级AI解决方案，助力企业数字化转型，提升竞争力
+          </p>
+        </motion.div>
+
+        {/* 标签页导航 */}
+        <div className="flex flex-wrap justify-center gap-4 mb-8">
+          {tabs.map((tab) => (
+            <motion.button
+              key={tab.id}
+              onClick={() => setActiveTab(tab.id)}
+              className={`flex items-center px-6 py-3 rounded-lg font-semibold transition-all duration-200 ${
+                activeTab === tab.id 
+                  ? 'bg-gradient-to-r from-cyan-400 to-green-400 text-black' 
+                  : 'bg-gray-800/50 text-gray-300 hover:bg-gray-700/50 hover:text-white'
+              }`}
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+            >
+              <FontAwesomeIcon icon={tab.icon} className="mr-2" />
+              {tab.name}
+            </motion.button>
+          ))}
         </div>
 
-        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+        {/* 错误提示 */}
+        {error && (
           <motion.div
-            initial={{ opacity: 0, y: 50 }}
+            initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 1 }}
+            className="mb-6 p-4 bg-red-500/20 border border-red-500/30 rounded-lg"
           >
-            <h1 className="text-5xl md:text-7xl font-bold mb-6">
-              <span className="bg-gradient-to-r from-green-400 via-emerald-400 to-teal-400 bg-clip-text text-transparent">
-                企业AI解决方案
-              </span>
-            </h1>
-            <p className="text-xl md:text-2xl text-gray-300 mb-8 max-w-3xl mx-auto">
-              定制化AI解决方案，从诊断到实施全流程服务，助力企业数字化转型
-            </p>
-            
-            <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12">
-              <motion.button
-                className="px-8 py-4 bg-gradient-to-r from-green-400 to-emerald-400 text-black font-bold rounded-lg text-lg hover:from-green-500 hover:to-emerald-500 transition-all duration-300 transform hover:scale-105"
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-              >
-                免费咨询
-              </motion.button>
-              <motion.button
-                className="px-8 py-4 border-2 border-green-400 text-green-400 font-bold rounded-lg text-lg hover:bg-green-400 hover:text-black transition-all duration-300"
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-              >
-                查看案例
-              </motion.button>
-            </div>
-
-            {/* Stats */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-8 max-w-4xl mx-auto">
-              <div className="text-center">
-                <div className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-green-400 to-emerald-400 bg-clip-text text-transparent">
-                  500+
-                </div>
-                <div className="text-gray-400 text-sm md:text-base">
-                  服务企业
-                </div>
-              </div>
-              <div className="text-center">
-                <div className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-green-400 to-emerald-400 bg-clip-text text-transparent">
-                  95%
-                </div>
-                <div className="text-gray-400 text-sm md:text-base">
-                  客户满意度
-                </div>
-              </div>
-              <div className="text-center">
-                <div className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-green-400 to-emerald-400 bg-clip-text text-transparent">
-                  2周
-                </div>
-                <div className="text-gray-400 text-sm md:text-base">
-                  平均部署时间
-                </div>
-              </div>
-              <div className="text-center">
-                <div className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-green-400 to-emerald-400 bg-clip-text text-transparent">
-                  24/7
-                </div>
-                <div className="text-gray-400 text-sm md:text-base">
-                  技术支持
-                </div>
-              </div>
+            <div className="flex items-center">
+              <FontAwesomeIcon icon={faTimes} className="text-red-400 mr-2" />
+              <span className="text-red-400">{error}</span>
             </div>
           </motion.div>
-        </div>
-      </section>
+        )}
 
-      {/* Benefits Section */}
-      <section className="py-20 bg-gray-900/50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          {/* 表单区域 */}
           <motion.div
-            initial={{ opacity: 0, y: 50 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-            className="text-center mb-16"
+            initial={{ opacity: 0, x: -50 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.6 }}
+            className="bg-gray-800/50 backdrop-blur-sm border border-gray-700 rounded-2xl p-8"
           >
-            <h2 className="text-4xl md:text-5xl font-bold mb-6">
-              为什么选择我们
-            </h2>
-            <p className="text-xl text-gray-300 max-w-3xl mx-auto">
-              专业的AI技术团队，丰富的企业服务经验，为您提供最优质的解决方案
-            </p>
-          </motion.div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-            {benefits.map((benefit, index) => (
-              <motion.div
-                key={index}
-                initial={{ opacity: 0, y: 50 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: index * 0.1 }}
-                className="text-center"
-              >
-                <div className="w-16 h-16 bg-gradient-to-r from-green-400 to-emerald-400 rounded-2xl flex items-center justify-center mx-auto mb-6">
-                  <FontAwesomeIcon icon={benefit.icon} className="text-2xl text-black" />
-                </div>
-                <h3 className="text-xl font-bold mb-4">{benefit.title}</h3>
-                <p className="text-gray-400">{benefit.description}</p>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Solutions Section */}
-      <section className="py-20">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <motion.div
-            initial={{ opacity: 0, y: 50 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-            className="text-center mb-16"
-          >
-            <h2 className="text-4xl md:text-5xl font-bold mb-6">
-              核心解决方案
-            </h2>
-            <p className="text-xl text-gray-300 max-w-3xl mx-auto">
-              针对不同行业和场景，提供专业化的AI解决方案
-            </p>
-          </motion.div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            {solutions.map((solution, index) => (
-              <motion.div
-                key={solution.id}
-                initial={{ opacity: 0, y: 50 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: index * 0.1 }}
-                className="group"
-              >
-                <div className={`absolute inset-0 bg-gradient-to-r ${solution.color} rounded-2xl blur-xl opacity-20 group-hover:opacity-40 transition-opacity duration-300`}></div>
-                <div className="relative bg-gray-800/50 backdrop-blur-sm border border-gray-700 rounded-2xl p-8 h-full hover:border-green-400/50 transition-all duration-300">
-                  <div className={`w-16 h-16 bg-gradient-to-r ${solution.color} rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300`}>
-                    <FontAwesomeIcon icon={solution.icon} className="text-2xl text-white" />
-                  </div>
-                  <h3 className="text-2xl font-bold mb-4">{solution.title}</h3>
-                  <p className="text-gray-400 mb-6 leading-relaxed">{solution.description}</p>
-                  
-                  <div className="mb-6">
-                    <h4 className="font-semibold mb-3">核心功能：</h4>
-                    <ul className="space-y-2">
-                      {solution.features.map((feature, idx) => (
-                        <li key={idx} className="flex items-center space-x-2 text-gray-300">
-                          <FontAwesomeIcon icon={faCheck} className="text-green-400 text-sm" />
-                          <span>{feature}</span>
-                        </li>
-                      ))}
-                    </ul>
+            {/* AI 咨询表单 */}
+            {activeTab === 'consultation' && (
+              <div>
+                <h2 className="text-2xl font-bold mb-6 flex items-center">
+                  <FontAwesomeIcon icon={faBuilding} className="mr-3 text-cyan-400" />
+                  AI 技术咨询
+                </h2>
+                
+                <form onSubmit={handleConsultation} className="space-y-6">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-300 mb-2">
+                      公司名称 *
+                    </label>
+                    <input
+                      type="text"
+                      value={consultationData.company_name}
+                      onChange={(e) => handleInputChange(consultationData, setConsultationData, 'company_name', e.target.value)}
+                      className="w-full px-4 py-3 bg-gray-700/50 text-white border border-gray-600 rounded-lg focus:outline-none focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/20"
+                      placeholder="请输入公司名称"
+                      required
+                    />
                   </div>
                   
-                  <div className="flex items-center justify-between">
-                    <span className="text-2xl font-bold text-green-400">{solution.price}</span>
-                    <motion.button
-                      className="px-6 py-3 bg-gradient-to-r from-green-400 to-emerald-400 text-black font-semibold rounded-lg hover:from-green-500 hover:to-emerald-500 transition-all duration-200 flex items-center space-x-2"
-                      whileHover={{ scale: 1.05 }}
-                      whileTap={{ scale: 0.95 }}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-300 mb-2">
+                      所属行业
+                    </label>
+                    <input
+                      type="text"
+                      value={consultationData.industry}
+                      onChange={(e) => handleInputChange(consultationData, setConsultationData, 'industry', e.target.value)}
+                      className="w-full px-4 py-3 bg-gray-700/50 text-white border border-gray-600 rounded-lg focus:outline-none focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/20"
+                      placeholder="例如：金融、教育、医疗、制造等"
+                    />
+                  </div>
+                  
+                  <div>
+                    <label className="block text-sm font-medium text-gray-300 mb-2">
+                      业务目标 *
+                    </label>
+                    <textarea
+                      value={consultationData.business_goals}
+                      onChange={(e) => handleInputChange(consultationData, setConsultationData, 'business_goals', e.target.value)}
+                      rows={4}
+                      className="w-full px-4 py-3 bg-gray-700/50 text-white border border-gray-600 rounded-lg focus:outline-none focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/20 resize-none"
+                      placeholder="请详细描述您的业务目标和AI应用需求..."
+                      required
+                    />
+                  </div>
+                  
+                  <div>
+                    <label className="block text-sm font-medium text-gray-300 mb-2">
+                      当前技术栈
+                    </label>
+                    <input
+                      type="text"
+                      value={consultationData.current_tech}
+                      onChange={(e) => handleInputChange(consultationData, setConsultationData, 'current_tech', e.target.value)}
+                      className="w-full px-4 py-3 bg-gray-700/50 text-white border border-gray-600 rounded-lg focus:outline-none focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/20"
+                      placeholder="例如：Python、Java、云服务等"
+                    />
+                  </div>
+                  
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-300 mb-2">
+                        预算范围
+                      </label>
+                      <input
+                        type="text"
+                        value={consultationData.budget_range}
+                        onChange={(e) => handleInputChange(consultationData, setConsultationData, 'budget_range', e.target.value)}
+                        className="w-full px-4 py-3 bg-gray-700/50 text-white border border-gray-600 rounded-lg focus:outline-none focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/20"
+                        placeholder="例如：10-50万"
+                      />
+                    </div>
+                    
+                    <div>
+                      <label className="block text-sm font-medium text-gray-300 mb-2">
+                        时间要求
+                      </label>
+                      <input
+                        type="text"
+                        value={consultationData.timeline}
+                        onChange={(e) => handleInputChange(consultationData, setConsultationData, 'timeline', e.target.value)}
+                        className="w-full px-4 py-3 bg-gray-700/50 text-white border border-gray-600 rounded-lg focus:outline-none focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/20"
+                        placeholder="例如：3-6个月"
+                      />
+                    </div>
+                  </div>
+                  
+                  <motion.button
+                    type="submit"
+                    disabled={loading}
+                    className="w-full px-6 py-4 bg-gradient-to-r from-cyan-400 to-green-400 text-black font-semibold rounded-lg hover:from-cyan-500 hover:to-green-500 transition-all duration-200 shadow-lg hover:shadow-xl disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center"
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                  >
+                    {loading ? (
+                      <>
+                        <FontAwesomeIcon icon={faSpinner} className="animate-spin mr-2" />
+                        分析中...
+                      </>
+                    ) : (
+                      <>
+                        <FontAwesomeIcon icon={faBuilding} className="mr-2" />
+                        获取咨询建议
+                      </>
+                    )}
+                  </motion.button>
+                </form>
+              </div>
+            )}
+
+            {/* 定制开发表单 */}
+            {activeTab === 'development' && (
+              <div>
+                <h2 className="text-2xl font-bold mb-6 flex items-center">
+                  <FontAwesomeIcon icon={faCode} className="mr-3 text-cyan-400" />
+                  定制开发服务
+                </h2>
+                
+                <form onSubmit={handleDevelopment} className="space-y-6">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-300 mb-2">
+                      项目名称 *
+                    </label>
+                    <input
+                      type="text"
+                      value={developmentData.project_name}
+                      onChange={(e) => handleInputChange(developmentData, setDevelopmentData, 'project_name', e.target.value)}
+                      className="w-full px-4 py-3 bg-gray-700/50 text-white border border-gray-600 rounded-lg focus:outline-none focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/20"
+                      placeholder="请输入项目名称"
+                      required
+                    />
+                  </div>
+                  
+                  <div>
+                    <label className="block text-sm font-medium text-gray-300 mb-2">
+                      项目类型
+                    </label>
+                    <select
+                      value={developmentData.project_type}
+                      onChange={(e) => handleInputChange(developmentData, setDevelopmentData, 'project_type', e.target.value)}
+                      className="w-full px-4 py-3 bg-gray-700/50 text-white border border-gray-600 rounded-lg focus:outline-none focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/20"
                     >
-                      <span>了解详情</span>
-                      <FontAwesomeIcon icon={faArrowRight} className="text-sm" />
-                    </motion.button>
+                      {projectTypes.map((type) => (
+                        <option key={type.value} value={type.value}>
+                          {type.label}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  
+                  <div>
+                    <label className="block text-sm font-medium text-gray-300 mb-2">
+                      需求描述 *
+                    </label>
+                    <textarea
+                      value={developmentData.requirements}
+                      onChange={(e) => handleInputChange(developmentData, setDevelopmentData, 'requirements', e.target.value)}
+                      rows={4}
+                      className="w-full px-4 py-3 bg-gray-700/50 text-white border border-gray-600 rounded-lg focus:outline-none focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/20 resize-none"
+                      placeholder="请详细描述项目需求和功能要求..."
+                      required
+                    />
+                  </div>
+                  
+                  <div>
+                    <label className="block text-sm font-medium text-gray-300 mb-2">
+                      功能特性
+                    </label>
+                    <input
+                      type="text"
+                      value={developmentData.features}
+                      onChange={(e) => handleInputChange(developmentData, setDevelopmentData, 'features', e.target.value)}
+                      className="w-full px-4 py-3 bg-gray-700/50 text-white border border-gray-600 rounded-lg focus:outline-none focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/20"
+                      placeholder="用逗号分隔，例如：用户管理,数据分析,AI功能"
+                    />
+                  </div>
+                  
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-300 mb-2">
+                        时间要求
+                      </label>
+                      <input
+                        type="text"
+                        value={developmentData.timeline}
+                        onChange={(e) => handleInputChange(developmentData, setDevelopmentData, 'timeline', e.target.value)}
+                        className="w-full px-4 py-3 bg-gray-700/50 text-white border border-gray-600 rounded-lg focus:outline-none focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/20"
+                        placeholder="例如：3个月"
+                      />
+                    </div>
+                    
+                    <div>
+                      <label className="block text-sm font-medium text-gray-300 mb-2">
+                        预算范围
+                      </label>
+                      <input
+                        type="text"
+                        value={developmentData.budget}
+                        onChange={(e) => handleInputChange(developmentData, setDevelopmentData, 'budget', e.target.value)}
+                        className="w-full px-4 py-3 bg-gray-700/50 text-white border border-gray-600 rounded-lg focus:outline-none focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/20"
+                        placeholder="例如：50-100万"
+                      />
+                    </div>
+                  </div>
+                  
+                  <motion.button
+                    type="submit"
+                    disabled={loading}
+                    className="w-full px-6 py-4 bg-gradient-to-r from-cyan-400 to-green-400 text-black font-semibold rounded-lg hover:from-cyan-500 hover:to-green-500 transition-all duration-200 shadow-lg hover:shadow-xl disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center"
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                  >
+                    {loading ? (
+                      <>
+                        <FontAwesomeIcon icon={faSpinner} className="animate-spin mr-2" />
+                        生成方案中...
+                      </>
+                    ) : (
+                      <>
+                        <FontAwesomeIcon icon={faCode} className="mr-2" />
+                        生成开发方案
+                      </>
+                    )}
+                  </motion.button>
+                </form>
+              </div>
+            )}
+
+            {/* 技术培训表单 */}
+            {activeTab === 'training' && (
+              <div>
+                <h2 className="text-2xl font-bold mb-6 flex items-center">
+                  <FontAwesomeIcon icon={faGraduationCap} className="mr-3 text-cyan-400" />
+                  技术培训方案
+                </h2>
+                
+                <form onSubmit={handleTraining} className="space-y-6">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-300 mb-2">
+                      公司名称 *
+                    </label>
+                    <input
+                      type="text"
+                      value={trainingData.company_name}
+                      onChange={(e) => handleInputChange(trainingData, setTrainingData, 'company_name', e.target.value)}
+                      className="w-full px-4 py-3 bg-gray-700/50 text-white border border-gray-600 rounded-lg focus:outline-none focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/20"
+                      placeholder="请输入公司名称"
+                      required
+                    />
+                  </div>
+                  
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-300 mb-2">
+                        团队规模
+                      </label>
+                      <input
+                        type="text"
+                        value={trainingData.team_size}
+                        onChange={(e) => handleInputChange(trainingData, setTrainingData, 'team_size', e.target.value)}
+                        className="w-full px-4 py-3 bg-gray-700/50 text-white border border-gray-600 rounded-lg focus:outline-none focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/20"
+                        placeholder="例如：10-20人"
+                      />
+                    </div>
+                    
+                    <div>
+                      <label className="block text-sm font-medium text-gray-300 mb-2">
+                        技能水平
+                      </label>
+                      <select
+                        value={trainingData.skill_level}
+                        onChange={(e) => handleInputChange(trainingData, setTrainingData, 'skill_level', e.target.value)}
+                        className="w-full px-4 py-3 bg-gray-700/50 text-white border border-gray-600 rounded-lg focus:outline-none focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/20"
+                      >
+                        {skillLevels.map((level) => (
+                          <option key={level.value} value={level.value}>
+                            {level.label}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                  </div>
+                  
+                  <div>
+                    <label className="block text-sm font-medium text-gray-300 mb-2">
+                      培训重点 *
+                    </label>
+                    <input
+                      type="text"
+                      value={trainingData.focus_areas}
+                      onChange={(e) => handleInputChange(trainingData, setTrainingData, 'focus_areas', e.target.value)}
+                      className="w-full px-4 py-3 bg-gray-700/50 text-white border border-gray-600 rounded-lg focus:outline-none focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/20"
+                      placeholder="用逗号分隔，例如：机器学习,深度学习,数据分析"
+                      required
+                    />
+                  </div>
+                  
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-300 mb-2">
+                        培训形式
+                      </label>
+                      <select
+                        value={trainingData.training_format}
+                        onChange={(e) => handleInputChange(trainingData, setTrainingData, 'training_format', e.target.value)}
+                        className="w-full px-4 py-3 bg-gray-700/50 text-white border border-gray-600 rounded-lg focus:outline-none focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/20"
+                      >
+                        {trainingFormats.map((format) => (
+                          <option key={format.value} value={format.value}>
+                            {format.label}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                    
+                    <div>
+                      <label className="block text-sm font-medium text-gray-300 mb-2">
+                        培训时长
+                      </label>
+                      <input
+                        type="text"
+                        value={trainingData.duration}
+                        onChange={(e) => handleInputChange(trainingData, setTrainingData, 'duration', e.target.value)}
+                        className="w-full px-4 py-3 bg-gray-700/50 text-white border border-gray-600 rounded-lg focus:outline-none focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/20"
+                        placeholder="例如：2周"
+                      />
+                    </div>
+                  </div>
+                  
+                  <motion.button
+                    type="submit"
+                    disabled={loading}
+                    className="w-full px-6 py-4 bg-gradient-to-r from-cyan-400 to-green-400 text-black font-semibold rounded-lg hover:from-cyan-500 hover:to-green-500 transition-all duration-200 shadow-lg hover:shadow-xl disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center"
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                  >
+                    {loading ? (
+                      <>
+                        <FontAwesomeIcon icon={faSpinner} className="animate-spin mr-2" />
+                        制定方案中...
+                      </>
+                    ) : (
+                      <>
+                        <FontAwesomeIcon icon={faGraduationCap} className="mr-2" />
+                        制定培训方案
+                      </>
+                    )}
+                  </motion.button>
+                </form>
+              </div>
+            )}
+
+            {/* 报价表单 */}
+            {activeTab === 'quote' && (
+              <div>
+                <h2 className="text-2xl font-bold mb-6 flex items-center">
+                  <FontAwesomeIcon icon={faCalculator} className="mr-3 text-cyan-400" />
+                  获取报价
+                </h2>
+                
+                <form onSubmit={handleQuote} className="space-y-6">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-300 mb-2">
+                      解决方案类型 *
+                    </label>
+                    <select
+                      value={quoteData.solution_type}
+                      onChange={(e) => handleInputChange(quoteData, setQuoteData, 'solution_type', e.target.value)}
+                      className="w-full px-4 py-3 bg-gray-700/50 text-white border border-gray-600 rounded-lg focus:outline-none focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/20"
+                      required
+                    >
+                      {solutionTypes.map((type) => (
+                        <option key={type.value} value={type.value}>
+                          {type.label}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  
+                  <div>
+                    <label className="block text-sm font-medium text-gray-300 mb-2">
+                      公司规模
+                    </label>
+                    <input
+                      type="text"
+                      value={quoteData.company_size}
+                      onChange={(e) => handleInputChange(quoteData, setQuoteData, 'company_size', e.target.value)}
+                      className="w-full px-4 py-3 bg-gray-700/50 text-white border border-gray-600 rounded-lg focus:outline-none focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/20"
+                      placeholder="例如：50-100人"
+                    />
+                  </div>
+                  
+                  <div>
+                    <label className="block text-sm font-medium text-gray-300 mb-2">
+                      项目范围 *
+                    </label>
+                    <textarea
+                      value={quoteData.project_scope}
+                      onChange={(e) => handleInputChange(quoteData, setQuoteData, 'project_scope', e.target.value)}
+                      rows={3}
+                      className="w-full px-4 py-3 bg-gray-700/50 text-white border border-gray-600 rounded-lg focus:outline-none focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/20 resize-none"
+                      placeholder="请描述项目范围和具体需求..."
+                      required
+                    />
+                  </div>
+                  
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-300 mb-2">
+                        时间要求
+                      </label>
+                      <input
+                        type="text"
+                        value={quoteData.timeline}
+                        onChange={(e) => handleInputChange(quoteData, setQuoteData, 'timeline', e.target.value)}
+                        className="w-full px-4 py-3 bg-gray-700/50 text-white border border-gray-600 rounded-lg focus:outline-none focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/20"
+                        placeholder="例如：3个月"
+                      />
+                    </div>
+                    
+                    <div>
+                      <label className="block text-sm font-medium text-gray-300 mb-2">
+                        具体需求
+                      </label>
+                      <input
+                        type="text"
+                        value={quoteData.requirements}
+                        onChange={(e) => handleInputChange(quoteData, setQuoteData, 'requirements', e.target.value)}
+                        className="w-full px-4 py-3 bg-gray-700/50 text-white border border-gray-600 rounded-lg focus:outline-none focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/20"
+                        placeholder="例如：AI模型开发"
+                      />
+                    </div>
+                  </div>
+                  
+                  <motion.button
+                    type="submit"
+                    disabled={loading}
+                    className="w-full px-6 py-4 bg-gradient-to-r from-cyan-400 to-green-400 text-black font-semibold rounded-lg hover:from-cyan-500 hover:to-green-500 transition-all duration-200 shadow-lg hover:shadow-xl disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center"
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                  >
+                    {loading ? (
+                      <>
+                        <FontAwesomeIcon icon={faSpinner} className="animate-spin mr-2" />
+                        计算报价中...
+                      </>
+                    ) : (
+                      <>
+                        <FontAwesomeIcon icon={faCalculator} className="mr-2" />
+                        获取报价
+                      </>
+                    )}
+                  </motion.button>
+                </form>
+              </div>
+            )}
+          </motion.div>
+
+          {/* 结果展示区域 */}
+          <motion.div
+            initial={{ opacity: 0, x: 50 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.6 }}
+            className="bg-gray-800/50 backdrop-blur-sm border border-gray-700 rounded-2xl p-8"
+          >
+            <h2 className="text-2xl font-bold mb-6">方案结果</h2>
+            
+            {loading && (
+              <div className="flex items-center justify-center py-12">
+                <FontAwesomeIcon icon={faSpinner} className="animate-spin text-4xl text-cyan-400" />
+              </div>
+            )}
+
+            {result && (
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="space-y-4"
+              >
+                <div className="bg-gray-700/30 border border-gray-600 rounded-lg p-4">
+                  <div className="text-gray-300 leading-relaxed whitespace-pre-wrap">
+                    {result}
                   </div>
                 </div>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
 
-      {/* CTA Section */}
-      <section className="py-20 bg-gradient-to-r from-gray-900 to-black">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <motion.div
-            initial={{ opacity: 0, y: 50 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-          >
-            <h2 className="text-4xl md:text-5xl font-bold mb-6">
-              开启企业AI转型之旅
-            </h2>
-            <p className="text-xl text-gray-300 mb-8 max-w-3xl mx-auto">
-              专业的AI顾问团队，为您量身定制数字化转型方案，助力企业实现智能化升级
-            </p>
-            
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <motion.button
-                className="px-8 py-4 bg-gradient-to-r from-green-400 to-emerald-400 text-black font-bold rounded-lg text-lg hover:from-green-500 hover:to-emerald-500 transition-all duration-300"
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-              >
-                预约咨询
-              </motion.button>
-              <motion.button
-                className="px-8 py-4 border-2 border-green-400 text-green-400 font-bold rounded-lg text-lg hover:bg-green-400 hover:text-black transition-all duration-300"
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-              >
-                下载方案
-              </motion.button>
-            </div>
+                <div className="flex space-x-3">
+                  <motion.button
+                    onClick={() => navigator.clipboard.writeText(result)}
+                    className="flex-1 px-4 py-2 bg-gray-700 text-white rounded-lg hover:bg-gray-600 transition-colors flex items-center justify-center"
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                  >
+                    <FontAwesomeIcon icon={faCheck} className="mr-2" />
+                    复制方案
+                  </motion.button>
+                  <motion.button
+                    onClick={() => window.print()}
+                    className="flex-1 px-4 py-2 bg-gray-700 text-white rounded-lg hover:bg-gray-600 transition-colors flex items-center justify-center"
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                  >
+                    <FontAwesomeIcon icon={faArrowRight} className="mr-2" />
+                    打印方案
+                  </motion.button>
+                </div>
+              </motion.div>
+            )}
+
+            {!loading && !result && (
+              <div className="text-center py-12 text-gray-400">
+                <FontAwesomeIcon icon={faBuilding} className="text-4xl mb-4" />
+                <p>填写左侧表单，获取专业的解决方案</p>
+              </div>
+            )}
           </motion.div>
         </div>
-      </section>
+      </div>
     </div>
   );
 };
