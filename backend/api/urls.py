@@ -1,10 +1,11 @@
 from django.urls import path
 from . import views
+from . import upload_views
 
 urlpatterns = [
     path('health/', views.health_check, name='health_check'),
     path('news/', views.NewsListView.as_view(), name='news-list'),
     path('news/<int:pk>/', views.NewsDetailView.as_view(), name='news-detail'),
-    path('upload/', views.FileUploadView.as_view(), name='file-upload'),
-    path('files/', views.FileListView.as_view(), name='file-list'),
+    path('upload/', upload_views.FileUploadView.as_view(), name='file-upload'),
+    path('files/', upload_views.FileListView.as_view(), name='file-list'),
 ] 

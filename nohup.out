@@ -1,9 +1,0 @@
-/Library/Frameworks/Python.framework/Versions/3.12/Resources/Python.app/Contents/MacOS/Python: can't open file '/Users/leeshaka/cursor test/manage.py': [Errno 2] No such file or directory
-npm error code ENOENT
-npm error syscall open
-npm error path /Users/leeshaka/cursor test/package.json
-npm error errno -2
-npm error enoent Could not read package.json: Error: ENOENT: no such file or directory, open '/Users/leeshaka/cursor test/package.json'
-npm error enoent This is related to npm not being able to find a file.
-npm error enoent
-npm error A complete log of this run can be found in: /Users/leeshaka/.npm/_logs/2025-07-26T09_43_38_338Z-debug-0.log
