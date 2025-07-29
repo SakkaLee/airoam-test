@@ -5,10 +5,19 @@ from pathlib import Path
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-your-secret-key-here')
+SECRET_KEY = os.environ.get('SECRET_KEY', '3x=e@6ivb=n7hdq%&dwqnau1-kgn$1c5nq)su=fbxkgmcy6za6')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.environ.get('DEBUG', 'False').lower() == 'true'
+
+# Security settings for production
+if not DEBUG:
+    SECURE_SSL_REDIRECT = True
+    SECURE_HSTS_SECONDS = 31536000
+    SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+    SECURE_HSTS_PRELOAD = True
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True
 
 ALLOWED_HOSTS = [
     "9ncysfs0.up.railway.app",
@@ -107,7 +116,13 @@ CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
     "https://airoam.net",
     "https://www.airoam.net",
+    "https://airoam.vercel.app",
+    "https://*.vercel.app",
+    "https://*.railway.app",
 ]
+
+# Allow credentials for CORS
+CORS_ALLOW_CREDENTIALS = True
 
 # REST Framework settings
 REST_FRAMEWORK = {

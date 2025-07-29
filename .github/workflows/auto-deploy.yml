@@ -29,10 +29,10 @@ jobs:
           npx playwright test
 
       - name: 触发 Vercel 重新部署
-        run: npx vercel --prod --token=${{ secrets.3rLsiToBks4KdiUxGgxWwwNH }}
+        run: npx vercel --prod --token=${{ secrets.VERCEL_TOKEN }}
         env:
-          VERCEL_ORG_ID: ${{ secrets.team_fDZRaMbLWVouEx0tdCWJQLU9 }}
-          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJEprj_CE6HmRWJDh3YKsk5R6e7GLFd1XvFCT_ID }}
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
 
       - name: 触发 Railway 重新部署
         run: |
