@@ -37,6 +37,11 @@ class NewsListView(APIView):
             print(f"Error fetching news: {e}")
             news_data = self.get_fallback_news()
         
+        # 新增：支持search参数过滤
+        search_query = request.GET.get('search', '').strip().lower()
+        if search_query:
+            news_data = [item for item in news_data if search_query in item.get('title', '').lower() or search_query in item.get('excerpt', '').lower() or search_query in item.get('content', '').lower() or search_query in item.get('source', '').lower()]
+        
         return Response({
             "news": news_data,
             "total_count": len(news_data),

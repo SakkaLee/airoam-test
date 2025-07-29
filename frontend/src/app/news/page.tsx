@@ -2,64 +2,59 @@ import Link from "next/link";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowLeft, faClock, faTag, faSearch, faFilter } from "@fortawesome/free-solid-svg-icons";
 import Logo from "../../components/Logo";
+import { useEffect, useState } from "react";
+
+interface NewsItem {
+  title: string;
+  excerpt: string;
+  content?: string;
+  category: string;
+  source: string;
+  time: string;
+  url?: string;
+  image?: string;
+}
 
 export default function NewsPage() {
-  const newsData = [
-    {
-      id: 1,
-      title: "AI beats human at Go again!",
-      excerpt: "A new AI system has once again defeated the world champion in Go, demonstrating the rapid progress of artificial intelligence in complex strategy games.",
-      category: "Breaking",
-      source: "X",
-      time: "2 hours ago",
-      image: "/api/placeholder/400/200"
-    },
-    {
-      id: 2,
-      title: "New GPT-5 research paper released",
-      excerpt: "OpenAI has published the first research paper on GPT-5, revealing breakthroughs in language understanding and reasoning capabilities.",
-      category: "Research",
-      source: "arXiv",
-      time: "5 hours ago",
-      image: "/api/placeholder/400/200"
-    },
-    {
-      id: 3,
-      title: "AI-powered robots enter mass production",
-      excerpt: "Leading manufacturers are rolling out AI-powered robots for logistics, healthcare, and manufacturing, accelerating the adoption of automation worldwide.",
-      category: "Industry",
-      source: "Medium",
-      time: "1 day ago",
-      image: "/api/placeholder/400/200"
-    },
-    {
-      id: 4,
-      title: "Breakthrough in AI image generation",
-      excerpt: "A new generative model can create photorealistic images from text prompts, pushing the boundaries of creative AI applications.",
-      category: "Creative AI",
-      source: "X",
-      time: "2 days ago",
-      image: "/api/placeholder/400/200"
-    },
-    {
-      id: 5,
-      title: "Quantum AI: The next frontier",
-      excerpt: "Researchers are exploring the intersection of quantum computing and artificial intelligence, potentially revolutionizing machine learning algorithms.",
-      category: "Research",
-      source: "Nature",
-      time: "3 days ago",
-      image: "/api/placeholder/400/200"
-    },
-    {
-      id: 6,
-      title: "AI ethics guidelines released",
-      excerpt: "Leading AI organizations have jointly released comprehensive ethics guidelines for responsible AI development and deployment.",
-      category: "Policy",
-      source: "MIT Tech Review",
-      time: "4 days ago",
-      image: "/api/placeholder/400/200"
+  const [newsData, setNewsData] = useState<NewsItem[]>([]);
+  const [search, setSearch] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+
+  // API base URL
+  const API_BASE = process.env.NEXT_PUBLIC_API_BASE || 'http://localhost:8000';
+
+  // 获取新闻数据
+  const fetchNews = async (searchValue = "") => {
+    setLoading(true);
+    setError("");
+    try {
+      const url = searchValue
+        ? `${API_BASE}/api/news/?search=${encodeURIComponent(searchValue)}`
+        : `${API_BASE}/api/news/`;
+      const res = await fetch(url);
+      if (!res.ok) throw new Error("获取新闻失败");
+      const data = await res.json();
+      setNewsData(data.news || []);
+    } catch (e) {
+      setError("新闻获取失败，请稍后重试");
+      setNewsData([]);
+    } finally {
+      setLoading(false);
     }
-  ];
+  };
+
+  useEffect(() => {
+    fetchNews();
+  }, []);
+
+  // 搜索栏输入时自动搜索
+  useEffect(() => {
+    const delayDebounce = setTimeout(() => {
+      fetchNews(search);
+    }, 500);
+    return () => clearTimeout(delayDebounce);
+  }, [search]);
 
   const categories = ["All", "Breaking", "Research", "Industry", "Creative AI", "Policy"];
 
@@ -113,6 +108,8 @@ export default function NewsPage() {
               type="text"
               placeholder="搜索新闻..."
               className="w-full pl-10 pr-4 py-3 bg-slate-800/50 text-white border border-slate-700/50 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent transition-all duration-200 placeholder-slate-400"
+              value={search}
+              onChange={e => setSearch(e.target.value)}
             />
           </div>
           <div className="flex gap-2">
@@ -141,46 +138,54 @@ export default function NewsPage() {
 
         {/* 新闻网格 */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {newsData.map((news) => (
-            <article key={news.id} className="bg-slate-800/50 backdrop-blur-sm rounded-2xl border border-slate-700/50 hover:border-blue-500/50 transition-all duration-300 hover:shadow-2xl hover:shadow-blue-500/10 group overflow-hidden">
-              <div className="aspect-video bg-slate-700/50 relative overflow-hidden">
-                <div className="absolute inset-0 bg-gradient-to-br from-blue-500/20 to-purple-500/20"></div>
-                <div className="absolute top-4 left-4">
-                  <span className={`px-3 py-1 text-xs font-semibold rounded-full ${
-                    news.category === "Breaking" ? "bg-red-500/20 text-red-300" :
-                    news.category === "Research" ? "bg-purple-500/20 text-purple-300" :
-                    news.category === "Industry" ? "bg-green-500/20 text-green-300" :
-                    news.category === "Creative AI" ? "bg-pink-500/20 text-pink-300" :
-                    "bg-orange-500/20 text-orange-300"
-                  }`}>
-                    {news.category}
-                  </span>
-                </div>
-              </div>
-              
-              <div className="p-6">
-                <div className="flex items-center gap-2 mb-3 text-xs text-slate-400">
-                  <FontAwesomeIcon icon={faClock} className="w-3 h-3" />
-                  {news.time}
-                  <span className="mx-2">•</span>
-                  <FontAwesomeIcon icon={faTag} className="w-3 h-3" />
-                  {news.source}
+          {loading ? (
+            <div className="col-span-3 text-center text-slate-400 py-8">加载中...</div>
+          ) : error ? (
+            <div className="col-span-3 text-center text-red-400 py-8">{error}</div>
+          ) : newsData.length === 0 ? (
+            <div className="col-span-3 text-center text-slate-400 py-8">暂无新闻</div>
+          ) : (
+            newsData.map((news, idx) => (
+              <article key={idx} className="bg-slate-800/50 backdrop-blur-sm rounded-2xl border border-slate-700/50 hover:border-blue-500/50 transition-all duration-300 hover:shadow-2xl hover:shadow-blue-500/10 group overflow-hidden">
+                <div className="aspect-video bg-slate-700/50 relative overflow-hidden">
+                  <div className="absolute inset-0 bg-gradient-to-br from-blue-500/20 to-purple-500/20"></div>
+                  <div className="absolute top-4 left-4">
+                    <span className={`px-3 py-1 text-xs font-semibold rounded-full ${
+                      news.category === "Breaking" ? "bg-red-500/20 text-red-300" :
+                      news.category === "Research" ? "bg-purple-500/20 text-purple-300" :
+                      news.category === "Industry" ? "bg-green-500/20 text-green-300" :
+                      news.category === "Creative AI" ? "bg-pink-500/20 text-pink-300" :
+                      "bg-orange-500/20 text-orange-300"
+                    }`}>
+                      {news.category}
+                    </span>
+                  </div>
                 </div>
                 
-                <h3 className="text-xl font-bold text-white mb-3 group-hover:text-blue-300 transition-colors line-clamp-2">
-                  {news.title}
-                </h3>
-                
-                <p className="text-slate-300 text-sm leading-relaxed mb-4 line-clamp-3">
-                  {news.excerpt}
-                </p>
-                
-                <button className="text-blue-400 hover:text-blue-300 font-medium text-sm transition-colors">
-                  阅读更多 →
-                </button>
-              </div>
-            </article>
-          ))}
+                <div className="p-6">
+                  <div className="flex items-center gap-2 mb-3 text-xs text-slate-400">
+                    <FontAwesomeIcon icon={faClock} className="w-3 h-3" />
+                    {news.time}
+                    <span className="mx-2">•</span>
+                    <FontAwesomeIcon icon={faTag} className="w-3 h-3" />
+                    {news.source}
+                  </div>
+                  
+                  <h3 className="text-xl font-bold text-white mb-3 group-hover:text-blue-300 transition-colors line-clamp-2">
+                    {news.title}
+                  </h3>
+                  
+                  <p className="text-slate-300 text-sm leading-relaxed mb-4 line-clamp-3">
+                    {news.excerpt}
+                  </p>
+                  
+                  <a href={news.url || "#"} target="_blank" rel="noopener noreferrer" className="text-blue-400 hover:text-blue-300 font-medium text-sm transition-colors">
+                    阅读更多 →
+                  </a>
+                </div>
+              </article>
+            ))
+          )}
         </div>
 
         {/* 分页 */}
