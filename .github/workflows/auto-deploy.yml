@@ -1,0 +1,52 @@
+name: 全自动一体化部署与测试
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy-and-test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 检出代码
+        uses: actions/checkout@v3
+
+      - name: 设置 Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '20'
+
+      - name: 安装前端依赖
+        run: |
+          cd frontend
+          npm install
+
+      - name: 运行前端自动化测试
+        run: |
+          cd frontend
+          npx playwright install
+          npx playwright test
+
+      - name: 触发 Vercel 重新部署
+        run: npx vercel --prod --token=${{ secrets.3rLsiToBks4KdiUxGgxWwwNH }}
+        env:
+          VERCEL_ORG_ID: ${{ secrets.team_fDZRaMbLWVouEx0tdCWJQLU9 }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJEprj_CE6HmRWJDh3YKsk5R6e7GLFd1XvFCT_ID }}
+
+      - name: 触发 Railway 重新部署
+        run: |
+          curl -X POST "https://backboard.railway.app/project/${{ secrets.RAILWAY_PROJECT_ID }}/deploy?service=${{ secrets.RAILWAY_SERVICE_ID }}" -H "Authorization: Bearer ${{ secrets.RAILWAY_TOKEN }}"
+
+      # 可选：邮件通知
+      # - name: 邮件通知
+      #   uses: dawidd6/action-send-mail@v3
+      #   with:
+      #     server_address: smtp.xxx.com
+      #     server_port: 465
+      #     username: ${{ secrets.MAIL_USER }}
+      #     password: ${{ secrets.MAIL_PASS }}
+      #     subject: "Airoam自动部署与测试结果"
+      #     to: 你的邮箱
+      #     body: |
+      #       自动部署与测试已完成，请登录Vercel/Railway查看详情。 

@@ -60,7 +60,7 @@ const EnterprisePage: React.FC = () => {
     requirements: ''
   });
 
-  const handleInputChange = (formData: any, setFormData: any, field: string, value: string) => {
+  const handleInputChange = <T extends Record<string, string>>(formData: T, setFormData: React.Dispatch<React.SetStateAction<T>>, field: string, value: string) => {
     setFormData({
       ...formData,
       [field]: value
