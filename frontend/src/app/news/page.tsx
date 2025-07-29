@@ -32,9 +32,11 @@ export default function NewsPage() {
       const url = searchValue
         ? `${API_BASE}/api/news/?search=${encodeURIComponent(searchValue)}`
         : `${API_BASE}/api/news/`;
+      console.log("[News Debug] Fetching:", url); // 调试输出
       const res = await fetch(url);
       if (!res.ok) throw new Error("获取新闻失败");
       const data = await res.json();
+      console.log("[News Debug] Response:", data); // 调试输出
       setNewsData(data.news || []);
     } catch (e) {
       setError("新闻获取失败，请稍后重试");
@@ -81,6 +83,11 @@ export default function NewsPage() {
       </header>
 
       {/* 页面头部 */}
+      {newsData.length > 0 && newsData.every(item => !item.title) && (
+        <div className="bg-red-600 text-white p-4 mb-4 rounded-lg text-center font-bold">
+          [调试警告] newsData 有内容但 title 字段为空，可能是渲染逻辑或数据结构问题。
+        </div>
+      )}
       <div className="max-w-7xl mx-auto px-4 lg:px-8 py-8">
         <div className="flex items-center gap-4 mb-8">
           <Link href="/" className="inline-flex items-center gap-2 text-slate-400 hover:text-white transition-colors">
